@@ -637,13 +637,18 @@ character translation."
                  #+sbcl sb-ext:*posix-argv* 
                  #+cmu (subseq extensions:*command-line-strings* 4)
                  #+allegro (sys:command-line-arguments)))
-    (if *test-verbose*
-        (format t "~A~%" (toxml (parse (open test) :compress-whitespace t) :indent t))
-        (progn
-          (format t "~40A" (concatenate 'string test "... "))
-          (if (parse (open test))
-              (format t "ok~%")
-              (format t "failed!~%")))))
+    (handler-bind ((error #'(lambda (c)
+			      (format t "FAILED with error:~%~S~%" c)
+			      (throw 'test-failure nil))))
+      (unless (search "CVS" test)
+	(catch 'test-failure 
+	  (if *test-verbose*
+	      (format t "~A~%" (toxml (parse (open test) :compress-whitespace t) :indent t))
+	      (progn
+		(format t "~40A" (concatenate 'string test "... "))
+		(if (parse (open test))
+		    (format t "ok~%")
+		    (format t "FAILED!~%"))))))))
   ;;(sb-profile:report)
   #+sbcl(sb-ext:quit)
   #+cmu(extensions:quit)
