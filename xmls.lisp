@@ -2,7 +2,15 @@
 
 (defpackage xmls
   (:use :cl) ; :cl-user
-  (:export node-name node-ns node-attrs node-children make-node parse toxml write-xml))
+  (:export node-name node-ns node-attrs node-children make-node parse toxml write-xml
+	   ;; additional helpers from Robert P. Goldman
+	   make-xmlrep xmlrep-add-child!
+	   xmlrep-tag xmlrep-tagmatch
+	   xmlrep-attribs xmlrep-children
+	   xmlrep-find-child-tags xmlrep-find-child-tag
+	   xmlrep-attrib-value
+	   xmlrep-boolean-attrib-value))
+	   
 
 (in-package :xmls)
 
