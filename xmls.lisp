@@ -1,7 +1,7 @@
 ;;; $Id$
 
 (defpackage xmls
-  (:use :cl :cl-user)
+  (:use :cl) ; :cl-user
   (:export node-name node-ns node-attrs node-children make-node parse toxml write-xml))
 
 (in-package :xmls)
@@ -99,6 +99,7 @@
 (defun write-escaped (string stream)
   "Writes string to stream with all character entities escaped."
   (coerce string 'simple-base-string)
+  (when (eq stream t) (setf stream *standard-output*))
   (loop for char across string
         for esc = (svref *char-escapes* (char-code char))
         do (write-sequence esc stream)))
@@ -117,7 +118,9 @@
 (defun generate-xml (e s indent)
   "Renders a lisp node tree to an xml string stream."
   (if (> indent 0) (incf indent))
-  (typecase e
+  ;; modified to etypecase for rudimentary error
+  ;; checking. [2004/08/31:rpg]
+  (etypecase e
     (list
      (progn
        (dotimes (i (* 2 (- indent 2)))
@@ -309,10 +312,13 @@ character translation."
 (defmatch letter ()
   (and c (alpha-char-p c)))
 
+;; Modified because *whitespace* is not defined at compile
+;; time. [2004/08/31:rpg]
 (defmatch ws-char ()
-  (case c
-    (#.*whitespace* t)
-    (t nil)))
+  (member c *whitespace*))
+;;;  (case c
+;;;    (#.*whitespace* t)
+;;;    (t nil)))
 
 (defmatch namechar ()
   (or 
