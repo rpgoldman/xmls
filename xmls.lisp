@@ -103,6 +103,13 @@
             nil
             str))
       str))
+
+(defun translate-raw-value (raw-value)
+  (etypecase raw-value
+    (string raw-value)
+    (symbol (symbol-name raw-value))
+    (integer (format nil "~D" raw-value))
+    (float (format nil "~G" raw-value))))	     
   
 (defun write-escaped (string stream)
   "Writes string to stream with all character entities escaped."
@@ -140,7 +147,7 @@
                   (write-string (first a) s)
                   (write-char #\= s)
                   (write-char #\" s)
-                  (write-escaped (second a) s)
+                  (write-escaped (translate-raw-value (second a)) s)
                   (write-char #\" s))))
      (if (null (node-children e))
          (progn
@@ -156,6 +163,11 @@
                    (write-char #\Space s))))
 	   (format s "</~A>" (node-name e))
            (if (> indent 0) (write-char #\Newline s)))))
+    ;; turn the number into a string, then recurse [2004/09/23:rpg]
+    (number
+     (generate-xml (translate-raw-value e) s indent))
+    (symbol
+     (generate-xml (translate-raw-value e) s indent))
     (string 
      (progn
        (if (> indent 0)
