@@ -1,4 +1,5 @@
 #!/bin/sh
+# $Id$
 
 CMDLINE="sbcl --noinform --load xmls --eval"
 FORM="(xmls::test)"

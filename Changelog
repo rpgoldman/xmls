@@ -1,3 +1,4 @@
+# $Id$
 1.2
     * add compilation guard around *whitespace* (5 million people)
     * generate-xml serializes numbers and symbols automatically (Robert Goldman)

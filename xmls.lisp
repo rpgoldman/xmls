@@ -1,4 +1,8 @@
 ;;; $Id$
+;;; xmls
+;;; a simple xml parser for common lisp
+;;; author: Miles Egan <miles@caddr.com>
+;;; see COPYING file for license information
 
 (defpackage xmls
   (:use :cl) ; :cl-user
@@ -20,14 +24,15 @@
 (defvar *strip-comments* t)
 (defvar *compress-whitespace* t)
 (defvar *test-verbose* nil)
-(defvar *whitespace* (remove-duplicates '(#\Newline #\Space #\Tab #\Return #\Linefeed)))
 (defvar *entities*
   #(("lt;" #\<)
     ("gt;" #\>)
     ("amp;" #\&)
     ("apos;" #\')
     ("quot;" #\")))
-
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *whitespace* (remove-duplicates 
+                        '(#\Newline #\Space #\Tab #\Return #\Linefeed))))
 (defvar *char-escapes*
   (let ((table (make-array 256 :element-type 'string :initial-element "")))
     (declare (type vector *entities*))
@@ -130,11 +135,17 @@
   "Shorthand function for adding characters to an extendable string."
   (vector-push-extend c string))
 
+(defun translate-raw-value (raw-value)
+  "Helper function for xml generation."
+  (etypecase raw-value
+    (string raw-value)
+    (symbol (symbol-name raw-value))
+    (integer (format nil "~D" raw-value))
+    (float (format nil "~G" raw-value))))
+
 (defun generate-xml (e s indent)
   "Renders a lisp node tree to an xml string stream."
   (if (> indent 0) (incf indent))
-  ;; modified to etypecase for rudimentary error
-  ;; checking. [2004/08/31:rpg]
   (etypecase e
     (list
      (progn
@@ -163,7 +174,6 @@
                    (write-char #\Space s))))
 	   (format s "</~A>" (node-name e))
            (if (> indent 0) (write-char #\Newline s)))))
-    ;; turn the number into a string, then recurse [2004/09/23:rpg]
     (number
      (generate-xml (translate-raw-value e) s indent))
     (symbol
@@ -619,7 +629,7 @@ character translation."
 ;;(trace end-tag comment comment-or-doctype content name xmldecl misc)
 ;;(trace processing-instruction processing-instruction-or-xmldecl element start-tag ws element-val)
 
-#(or sbcl cmu allegro)
+#+(or sbcl cmu allegro)
 (defun test ()
   ;;(sb-profile:profile "XMLS")
   #+cmu(extensions:gc-off) ;; too noisy
