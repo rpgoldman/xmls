@@ -1,4 +1,9 @@
-# $Id$
+1.2
+    * add compilation guard around *whitespace* (5 million people)
+    * generate-xml serializes numbers and symbols automatically (Robert Goldman)
+
+1.1.1
+    * fix typo in test function guard
 
 1.1
     * merge Barry Wilkes patches for ws in attributes
