@@ -25,7 +25,7 @@
   (string-equal tag (xmlrep-tag treenode)))
 
 (defun xmlrep-attribs (treenode)
-  (second treenode))
+  (node-attrs treenode))
 
 (defun xmlrep-children (treenode)
   (cddr treenode))
@@ -35,13 +35,16 @@
   (remove-if-not #'(lambda (child) (xmlrep-tagmatch tag child))
 		 (xmlrep-children treenode)))
 
-(defun xmlrep-find-child-tag (tag treenode)
+(defun xmlrep-find-child-tag (tag treenode
+				  &optional (if-unfound :error))
   "Find a single child of TREENODE with TAG.  Returns an error
 if there is more or less than one such child."
   (let ((matches (xmlrep-find-child-tags tag treenode)))
     (case (length matches)
-      (0 (error "Couldn't find child tag ~A in ~A"
-		tag treenode))
+      (0 (if (eq if-unfound :error)
+	     (error "Couldn't find child tag ~A in ~A"
+		tag treenode)
+	     if-unfound))
       (1 (first matches))
       (otherwise (error "Child tag ~A multiply defined in ~A"
 			tag treenode)))))
