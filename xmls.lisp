@@ -118,7 +118,7 @@
   
 (defun write-escaped (string stream)
   "Writes string to stream with all character entities escaped."
-  (coerce string 'simple-base-string)
+  #-allegro (coerce string 'simple-base-string)
   (when (eq stream t) (setf stream *standard-output*))
   (loop for char across string
         for esc = (svref *char-escapes* (char-code char))
@@ -607,7 +607,9 @@ character translation."
 ;;;-----------------------------------------------------------------------------
 (defun write-xml (e s &key (indent nil))
   "Renders a lisp node tree to an xml stream.  Indents if indent is non-nil."
-  (generate-xml e s (if indent 1 0)))
+  (if (null s)
+      (toxml e :indent indent)
+    (generate-xml e s (if indent 1 0))))
 
 (defun toxml (e &key (indent nil))
   "Renders a lisp node tree to an xml string."
