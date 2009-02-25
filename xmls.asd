@@ -7,5 +7,7 @@
 (defsystem :xmls
     :version "1.2"
     :components ((:file "xmls")
-		 (:file "xmlrep-helpers")))
+                 (:file "xmlrep-helpers"
+                        ;; package is defined in XMLS. [2009/02/24:rpg]
+                        :depends-on ("xmls"))))
 
