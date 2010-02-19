@@ -7,14 +7,14 @@
 (defpackage xmls
   (:use :cl) ; :cl-user
   (:export node-name node-ns node-attrs node-children make-node parse toxml write-xml
-	   ;; additional helpers from Robert P. Goldman
-	   make-xmlrep xmlrep-add-child!
-	   xmlrep-tag xmlrep-tagmatch
-	   xmlrep-attribs xmlrep-children
-	   xmlrep-find-child-tags xmlrep-find-child-tag
-	   xmlrep-attrib-value
-	   xmlrep-boolean-attrib-value))
-	   
+           ;; additional helpers from Robert P. Goldman
+           make-xmlrep xmlrep-add-child!
+           xmlrep-tag xmlrep-tagmatch
+           xmlrep-attribs xmlrep-children
+           xmlrep-find-child-tags xmlrep-find-child-tag
+           xmlrep-attrib-value
+           xmlrep-boolean-attrib-value))
+
 
 (in-package :xmls)
 
@@ -31,7 +31,7 @@
     ("apos;" #\')
     ("quot;" #\")))
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defvar *whitespace* (remove-duplicates 
+  (defvar *whitespace* (remove-duplicates
                         '(#\Newline #\Space #\Tab #\Return #\Linefeed))))
 (defvar *char-escapes*
   (let ((table (make-array 256 :element-type 'string :initial-element "")))
@@ -56,7 +56,7 @@
 ;;;-----------------------------------------------------------------------------
 ;;; CONDITIONS
 ;;;-----------------------------------------------------------------------------
-(define-condition xml-parse-error (error) 
+(define-condition xml-parse-error (error)
   ((line :initarg :line
          :reader error-line)))
 
@@ -65,8 +65,8 @@
 ;;;-----------------------------------------------------------------------------
 (defun make-node (&key name ns attrs child children)
   "Convenience function for creating a new xml node."
-  (list* (if ns (cons name ns) name) 
-         attrs 
+  (list* (if ns (cons name ns) name)
+         attrs
          (if child
              (list child)
              children)))
@@ -87,13 +87,13 @@
 
 (defun node-attrs (elem) (second elem))
 
-(defun (setf node-attrs) (attrs elem) 
+(defun (setf node-attrs) (attrs elem)
   (setf (second elem) attrs))
 
 (defun node-children (elem)
   (cddr elem))
 
-(defun (setf node-children) (children elem) 
+(defun (setf node-children) (children elem)
   (rplacd (cdr elem) children)
   (node-children elem))
 
@@ -114,8 +114,8 @@
     (string raw-value)
     (symbol (symbol-name raw-value))
     (integer (format nil "~D" raw-value))
-    (float (format nil "~G" raw-value))))	     
-  
+    (float (format nil "~G" raw-value))))
+
 (defun write-escaped (string stream)
   "Writes string to stream with all character entities escaped."
   #-allegro (coerce string 'simple-base-string)
@@ -164,7 +164,7 @@
          (progn
            (write-string "/>" s)
            (if (> indent 0) (write-char #\Newline s)))
-	 (progn
+         (progn
            (write-char #\> s)
            (if (> indent 0) (write-char #\Newline s))
            (mapcan (lambda (c) (generate-xml c s indent)) (node-children e))
@@ -172,13 +172,13 @@
                (progn
                  (dotimes (i (* 2 (- indent 2)))
                    (write-char #\Space s))))
-	   (format s "</~A>" (node-name e))
+           (format s "</~A>" (node-name e))
            (if (> indent 0) (write-char #\Newline s)))))
     (number
      (generate-xml (translate-raw-value e) s indent))
     (symbol
      (generate-xml (translate-raw-value e) s indent))
-    (string 
+    (string
      (progn
        (if (> indent 0)
            (progn
@@ -201,7 +201,7 @@
   "Resolves the xml entity ENT to a character.  Numeric entities are
 converted using CODE-CHAR, which only works in implementations that
 internally encode strings in US-ASCII, ISO-8859-1 or UCS."
-  (declare (type simple-base-string ent))
+  (declare (type simple-string ent))
   (declare (type vector *entities*))
   (or (and (>= (length ent) 2)
            (char= (char ent 0) #\#)
@@ -302,7 +302,7 @@ character translation."
   "Match definition macro that provides a common lexical environment for matchers."
   `(defun ,name (c)
     ,@body))
-  
+
 (defmacro defrule (name &rest body)
   "Rule definition macro that provides a common lexical environment for rules."
   `(defun ,name (s)
@@ -351,14 +351,14 @@ character translation."
 ;;;    (t nil)))
 
 (defmatch namechar ()
-  (or 
+  (or
    (and c (alpha-char-p c))
    (and c (digit-char-p c))
    (case c
      ((#\. #\- #\_ #\:) t))))
 
 (defmatch ncname-char ()
-  (or 
+  (or
    (and c (alpha-char-p c))
    (and c (digit-char-p c))
    (case c
@@ -486,21 +486,21 @@ character translation."
                                 (push-string (eat) data)))
                          (1 (if (match #\])
                                 (incf state)
-                                (progn 
+                                (progn
                                   (setf state 0)
                                   (push-string #\] data)
                                   (push-string (eat) data))))
                          (2 (if (match #\>)
                                 (incf state)
-                                (progn 
+                                (progn
                                   (setf state 0)
                                   (push-string #\] data)
                                   (push-string #\] data)
                                   (push-string (eat) data)))))
                     until (eq state 3)
-                    finally (return (make-element 
-                                     :type 'cdata 
-                                     :val (coerce data 'simple-base-string)))))))))
+                    finally (return (make-element
+                                     :type 'cdata
+                                     :val (coerce data 'simple-string)))))))))
 
 (declaim (ftype function element))     ; forward decl for content rule
 (defrule content ()
@@ -584,7 +584,7 @@ character translation."
             (make-element :type 'doctype)))))
 
 (defrule misc ()
-  (or 
+  (or
    (ws s)
    (and (match #\<) (must (or (processing-instruction s)
                               (comment-or-doctype s)
@@ -635,22 +635,22 @@ character translation."
 (defun test ()
   ;;(sb-profile:profile "XMLS")
   #+cmu(extensions:gc-off) ;; too noisy
-  (dolist (test (cdr 
-                 #+sbcl sb-ext:*posix-argv* 
+  (dolist (test (cdr
+                 #+sbcl sb-ext:*posix-argv*
                  #+cmu (subseq extensions:*command-line-strings* 4)
                  #+allegro (sys:command-line-arguments)))
     (handler-bind ((error #'(lambda (c)
-			      (format t "FAILED with error:~%~S~%" c)
-			      (throw 'test-failure nil))))
+                              (format t "FAILED with error:~%~S~%" c)
+                              (throw 'test-failure nil))))
       (unless (search "CVS" test)
-	(catch 'test-failure 
-	  (if *test-verbose*
-	      (format t "~A~%" (toxml (parse (open test) :compress-whitespace t) :indent t))
-	      (progn
-		(format t "~40A" (concatenate 'string test "... "))
-		(if (parse (open test))
-		    (format t "ok~%")
-		    (format t "FAILED!~%"))))))))
+        (catch 'test-failure
+          (if *test-verbose*
+              (format t "~A~%" (toxml (parse (open test) :compress-whitespace t) :indent t))
+              (progn
+                (format t "~40A" (concatenate 'string test "... "))
+                (if (parse (open test))
+                    (format t "ok~%")
+                    (format t "FAILED!~%"))))))))
   ;;(sb-profile:report)
   #+sbcl(sb-ext:quit)
   #+cmu(extensions:quit)
