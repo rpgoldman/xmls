@@ -641,6 +641,7 @@ character translation."
               (format t "~A~%" (toxml (parse (open test) :compress-whitespace t) :indent t))
               (progn
                 (format t "~40A" (concatenate 'string test "... "))
+                (force-output)
                 (if (parse (open test))
                     (format t "ok~%")
                     (format t "FAILED!~%"))))))))
