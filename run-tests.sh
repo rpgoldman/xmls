@@ -18,7 +18,7 @@ USAGE
     exit 1
 }
 
-CMDLINE="sbcl --noinform --load xmls --load xmlrep-helpers --eval"
+CMDLINE="sbcl --no-userinit --load xmls --load xmlrep-helpers --eval"
 while [ $# -gt 0 ]; do 
     case $1 in
         --cmucl)
