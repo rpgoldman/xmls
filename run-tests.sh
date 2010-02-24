@@ -1,9 +1,7 @@
 #!/bin/sh
 # $Id$
 
-CMDLINE="sbcl --noinform --load xmls --eval"
 FORM="(xmls::test)"
-ALLEGROCMD="/usr/local/acl/acl62/lisp"
 SEPARATOR=""
 
 usage () {
@@ -14,19 +12,26 @@ options:
     --cmucl run tests with cmucl
     --all run all tests in tests directory
     --verbose output parsed xml
-    --acl62 run tests with Allegro Common Lisp, v6.2
+    --allegro run tests with Allegro Common Lisp, ANSI mode
+    --allegromodern run tests with Allegro Common Lisp, modern case-sensitive mode
 USAGE
     exit 1
 }
 
+CMDLINE="sbcl --noinform --load xmls --load xmlrep-helpers --eval"
 while [ $# -gt 0 ]; do 
     case $1 in
         --cmucl)
-            CMDLINE="lisp -load xmls -eval"
+            CMDLINE="lisp -load xmls -load xmlrep-helpers -eval"
             shift
             ;;
-        --acl62)
-            CMDLINE="${ALLEGROCMD} -L xmls -e"
+        --allegro)
+            CMDLINE="alisp -q -L xmls -L xmlrep-helpers -e"
+            SEPARATOR="--"
+            shift
+            ;;
+        --allegromodern)
+            CMDLINE="mlisp -q -L xmls -L xmlrep-helpers -e"
             SEPARATOR="--"
             shift
             ;;
@@ -42,8 +47,10 @@ while [ $# -gt 0 ]; do
             TESTS="$*"
             break
             ;;
-    esac
+        esac
 done
+
+
 
 if test -z "$TESTS"; then
     usage
