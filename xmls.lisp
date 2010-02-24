@@ -109,13 +109,6 @@
             str))
       str))
 
-(defun translate-raw-value (raw-value)
-  (etypecase raw-value
-    (string raw-value)
-    (symbol (symbol-name raw-value))
-    (integer (format nil "~D" raw-value))
-    (float (format nil "~G" raw-value))))
-
 (defun write-escaped (string stream)
   "Writes string to stream with all character entities escaped."
   #-allegro (coerce string 'simple-base-string)
