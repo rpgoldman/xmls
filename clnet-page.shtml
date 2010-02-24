@@ -24,6 +24,7 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
   </tr> 
   
   <tr> 
+    <td>&nbsp;</td> 
    <td>xmls-1.2</td> 
     <td><a href="xmls-1.2.tar.gz">source</a></td> 
     <td><a href="xmls-1.2.tar.gz.asc">signature</a></td> 
@@ -33,7 +34,7 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
 
   <tr> 
     <td>&nbsp;</td> 
-    <td>xmls-1.1</td> 
+   <td>xmls-1.1</td> 
     <td><a href="xmls-1.1.tar.gz">source</a></td> 
     <td><a href="xmls-1.1.tar.gz.asc">signature</a></td> 
     <td><a href="xmls-1.1.tar.gz.md5">md5</a></td> 
