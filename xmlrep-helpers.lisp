@@ -19,7 +19,7 @@
   (nconc xmlrep (list child)))
 
 (defun xmlrep-tag (treenode)
-  (first treenode))
+  (node-name treenode))
 
 (defun xmlrep-tagmatch (tag treenode)
   (string-equal tag (xmlrep-tag treenode)))
