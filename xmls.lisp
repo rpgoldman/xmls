@@ -644,9 +644,8 @@ character translation."
 (defun test ()
   ;;(sb-profile:profile "XMLS")
   #+cmu(extensions:gc-off) ;; too noisy
-  (format t "~&Unprocessed command line arguments:~%~s~%"
-          ccl:*unprocessed-command-line-arguments*)
-  (dolist (test #-ccl
+  (dolist (test
+            #-ccl
            (cdr
             #+sbcl sb-ext:*posix-argv*
             #+abcl extensions:*command-line-argument-list*
