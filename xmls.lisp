@@ -117,6 +117,22 @@
         for esc = (svref *char-escapes* (char-code char))
         do (write-sequence esc stream)))
 
+;;; Alternative definition, lifted from Edi Weitz's hunchentoot, per Norman
+;;; Werner's suggestion. [2010/12/09:rpg]
+(defun escape-for-html (string)
+  "Escapes the characters #\\<, #\\>, #\\', #\\\", and #\\& for HTML output."
+  (with-output-to-string (out)
+    (with-input-from-string (in string)
+      (loop for char = (read-char in nil nil)
+            while char
+            do (case char
+                 ((#\<) (write-string "&lt;" out))
+                 ((#\>) (write-string "&gt;" out))
+                 ((#\") (write-string "&quot;" out))
+                 ((#\') (write-string "&#039;" out))
+                 ((#\&) (write-string "&amp;" out))
+                 (otherwise (write-char char out)))))))
+
 (defun make-extendable-string (&optional (size 10))
   "Creates an adjustable string with a fill pointer."
   (make-array size
@@ -624,12 +640,13 @@ character translation."
 ;;(trace end-tag comment comment-or-doctype content name xmldecl misc)
 ;;(trace processing-instruction processing-instruction-or-xmldecl element start-tag ws element-val)
 
-#+(or sbcl cmu allegro)
+#+(or sbcl cmu allegro abcl ccl)
 (defun test ()
   ;;(sb-profile:profile "XMLS")
   #+cmu(extensions:gc-off) ;; too noisy
   (dolist (test (cdr
                  #+sbcl sb-ext:*posix-argv*
+                 #+abcl extensions:*command-line-argument-list*
                  #+cmu (subseq extensions:*command-line-strings* 4)
                  #+allegro (sys:command-line-arguments)))
     (handler-bind ((error #'(lambda (c)
@@ -646,6 +663,8 @@ character translation."
                     (format t "ok~%")
                     (format t "FAILED!~%"))))))))
   ;;(sb-profile:report)
+  #+abcl (extensions:quit)
+  #+ccl (ccl:quit)
   #+sbcl(sb-ext:quit)
   #+cmu(extensions:quit)
   #+allegro(excl:exit))
