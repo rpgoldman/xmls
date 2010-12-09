@@ -10,29 +10,50 @@ usage: run-tests.sh [options] [tests]
 options: 
     --sbcl run tests with sbcl (default)
     --cmucl run tests with cmucl
-    --all run all tests in tests directory
-    --verbose output parsed xml
+    --abcl run tests with abcl
+    --ccl run tests with clozure common lisp
     --allegro run tests with Allegro Common Lisp, ANSI mode
     --allegromodern run tests with Allegro Common Lisp, modern case-sensitive mode
+    --all run all tests in tests directory
+    --verbose output parsed xml
 USAGE
     exit 1
 }
 
-CMDLINE="sbcl --no-userinit --load xmls --load xmlrep-helpers --eval"
+command="${SBCL:-sbcl}"
+CMDLINE="${command} --no-userinit --load xmls --load xmlrep-helpers --eval"
 while [ $# -gt 0 ]; do 
     case $1 in
+        --abcl)
+            command="${ABCL:-abcl}"
+            CMDLINE="${command} --noinit --noinform --load xmls --load xmlrep-helpers --eval"
+            shift
+            ;;
+        --ccl)
+            command="${CCL:-ccl}"
+            CMDLINE="${command} --no-init --quiet --load xmls --load xmlrep-helpers --eval"
+            SEPARATOR="--"
+            shift
+            ;;
         --cmucl)
-            CMDLINE="lisp -load xmls -load xmlrep-helpers -eval"
+            command="${CMUCL:-lisp}"
+            CMDLINE="${command} -load xmls -load xmlrep-helpers -eval"
             shift
             ;;
         --allegro)
-            CMDLINE="alisp -q -L xmls -L xmlrep-helpers -e"
+            command="${ALLEGRO:-alisp}"
+            CMDLINE="${command} -q -L xmls -L xmlrep-helpers -e"
             SEPARATOR="--"
             shift
             ;;
         --allegromodern)
-            CMDLINE="mlisp -q -L xmls -L xmlrep-helpers -e"
+            command="${ALLEGROMODERN:-mlisp}"
+            CMDLINE="{command} -q -L xmls -L xmlrep-helpers -e"
             SEPARATOR="--"
+            shift
+            ;;
+        --sbcl)
+            # the default...
             shift
             ;;
         --all)
