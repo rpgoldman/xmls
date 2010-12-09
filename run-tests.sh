@@ -48,7 +48,7 @@ while [ $# -gt 0 ]; do
             ;;
         --allegromodern)
             command="${ALLEGROMODERN:-mlisp}"
-            CMDLINE="{command} -q -L xmls -L xmlrep-helpers -e"
+            CMDLINE="${command} -q -L xmls -L xmlrep-helpers -e"
             SEPARATOR="--"
             shift
             ;;
@@ -63,6 +63,12 @@ while [ $# -gt 0 ]; do
         --verbose)
             FORM="(progn (setf xmls::*test-verbose* t)(xmls::test))"
             shift
+            ;;
+        --help)
+            usage
+            ;;
+        -u) 
+            usage
             ;;
         *)
             TESTS="$*"
