@@ -644,11 +644,16 @@ character translation."
 (defun test ()
   ;;(sb-profile:profile "XMLS")
   #+cmu(extensions:gc-off) ;; too noisy
-  (dolist (test (cdr
-                 #+sbcl sb-ext:*posix-argv*
-                 #+abcl extensions:*command-line-argument-list*
-                 #+cmu (subseq extensions:*command-line-strings* 4)
-                 #+allegro (sys:command-line-arguments)))
+  (format t "~&Unprocessed command line arguments:~%~s~%"
+          ccl:*unprocessed-command-line-arguments*)
+  (dolist (test #-ccl
+           (cdr
+            #+sbcl sb-ext:*posix-argv*
+            #+abcl extensions:*command-line-argument-list*
+            #+cmu (subseq extensions:*command-line-strings* 4)
+            #+allegro (sys:command-line-arguments))
+           #+ccl
+           ccl:*unprocessed-command-line-arguments*)
     (handler-bind ((error #'(lambda (c)
                               (format t "FAILED with error:~%~S~%" c)
                               (throw 'test-failure nil))))
