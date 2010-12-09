@@ -109,16 +109,19 @@
             str))
       str))
 
-(defun write-escaped (string stream)
-  "Writes string to stream with all character entities escaped."
-  #-allegro (coerce string 'simple-base-string)
-  (when (eq stream t) (setf stream *standard-output*))
-  (loop for char across string
-        for esc = (svref *char-escapes* (char-code char))
-        do (write-sequence esc stream)))
+;; (defun write-escaped (string stream)
+;;   "Writes string to stream with all character entities escaped."
+;;   #-allegro (coerce string 'simple-base-string)
+;;   (when (eq stream t) (setf stream *standard-output*))
+;;   (loop for char across string
+;;         for esc = (svref *char-escapes* (char-code char))
+;;         do (write-sequence esc stream)))
 
 ;;; Alternative definition, lifted from Edi Weitz's hunchentoot, per Norman
 ;;; Werner's suggestion. [2010/12/09:rpg]
+(defun write-escaped (string stream)
+  (write-string (escape-for-html string) stream))
+
 (defun escape-for-html (string)
   "Escapes the characters #\\<, #\\>, #\\', #\\\", and #\\& for HTML output."
   (with-output-to-string (out)
@@ -666,9 +669,18 @@ character translation."
                 (if (parse (open test))
                     (format t "ok~%")
                     (format t "FAILED!~%"))))))))
+      (handler-bind ((error #'(lambda (c)
+                              (format t "FAILED with error:~%~S~%" c)
+                              (throw 'test-failure nil))))
+        (catch 'test-failure
+          (format t "~40A" "Escaped writing...")
+          (force-output)
+          (with-output-to-string (str)
+          (write-escaped "ÄΩ" str))
+          (format t "ok~%")))
   ;;(sb-profile:report)
   #+abcl (extensions:quit)
   #+ccl (ccl:quit)
-  #+sbcl(sb-ext:quit)
+  #+sbcl (sb-ext:quit)
   #+cmu(extensions:quit)
   #+allegro(excl:exit))
