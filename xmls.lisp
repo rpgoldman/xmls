@@ -247,6 +247,10 @@ character translation."
   "Consumes one character from the input stream."
   `(read-char (state-stream s)))
 
+(defmacro puke (char)
+  "The opposite of EAT."
+  `(unread-char ,char (state-stream s)))
+
 (defmacro match (&rest matchers)
   "Attempts to match the next input character with one of the supplied matchers."
   `(let ((c (peek-stream (state-stream s))))
@@ -484,6 +488,9 @@ character translation."
      t)
    (make-element :type 'comment)))
 
+;;; the following is buggy, because it does not properly back up when it gets a
+;;; mismatch.  An example buggy string is: "<name><![CDATA[x]]]></name>"
+;;; [2011/02/21:rpg]
 (defrule comment-or-cdata ()
   (and
    (peek #\!)
@@ -500,16 +507,23 @@ character translation."
                                 (incf state)
                                 (progn
                                   (setf state 0)
+                                  ;; dump the first close-bracket
                                   (push-string #\] data)
-                                  (push-string (eat) data))))
+                                  ;; just go back to the matching process [2011/02/21:rpg]
+                                  ;; (push-string (eat) data)
+                                  )))
                          (2 (if (match #\>)
                                 (incf state)
                                 (progn
                                   (setf state 0)
+                                  ;; the FIRST close-bracket doesn't start a match
                                   (push-string #\] data)
-                                  (push-string #\] data)
-                                  (push-string (eat) data)))))
-                    until (eq state 3)
+                                  ;; start reading again from the second close-bracket, which might
+                                  ;; start a match... [2011/02/21:rpg]
+                                  (puke #\])
+                                  ;; (push-string (eat) data)
+                                  ))))
+                    until (eql state 3)
                     finally (return (make-element
                                      :type 'cdata
                                      :val (coerce data 'simple-string)))))))))
