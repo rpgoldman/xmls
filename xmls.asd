@@ -5,9 +5,14 @@
 (in-package :xmls-system)
 
 (defsystem :xmls
-    :version "1.4.0"
+    :version "1.3.1"
     :components ((:file "xmls")
                  (:file "xmlrep-helpers"
                         ;; package is defined in XMLS. [2009/02/24:rpg]
                         :depends-on ("xmls"))))
 
+;;; These are additional standalone tests
+(defsystem :xmls-test
+  :version "1.3.1"
+  :depends-on (xmls nst)
+  :components ((:file "nst-tests")))
