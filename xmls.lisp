@@ -491,42 +491,104 @@ character translation."
 ;;; the following is buggy, because it does not properly back up when it gets a
 ;;; mismatch.  An example buggy string is: "<name><![CDATA[x]]]></name>"
 ;;; [2011/02/21:rpg]
+;; (defrule comment-or-cdata ()
+;;   (and
+;;    (peek #\!)
+;;    (must (or (comment s)
+;;              (and
+;;               (match-seq #\[ #\C #\D #\A #\T #\A #\[)
+;;               (loop with data = (make-extendable-string 50)
+;;                     with state = 0
+;;                     do (case state
+;;                          (0 (cond ((match #\])
+;;                                    (norvig:dbg :cdata "Match #\], go to state 1.")
+;;                                    (incf state))
+;;                                   (t
+;;                                    (push-string (eat) data))))
+;;                          (1 (cond ((match #\])
+;;                                    (norvig:dbg :cdata "Match second #\], go to state 2.")
+;;                                    (incf state))
+;;                                   (t
+;;                                    (norvig:dbg :cdata "Fail to match second #\], go to state 0.")
+;;                                    (setf state 0)
+;;                                    ;; dump the first close-bracket
+;;                                    (push-string #\] data)
+;;                                    ;; just go back to the matching process [2011/02/21:rpg]
+;;                                    ;; (push-string (eat) data)
+;;                                    )))
+;;                          (2 (cond ((match #\>)
+;;                                    (norvig:dbg :cdata "Finish closing of CDATA.")
+;;                                    (incf state))
+;;                                   (t
+;;                                    (norvig:dbg :cdata "Fail to find >, return to state 0.")
+;;                                    (setf state 0)
+;;                                    ;; the FIRST close-bracket doesn't start a match
+;;                                    (push-string #\] data)
+;;                                    ;; start reading again from the second close-bracket, which might
+;;                                    ;; start a match... [2011/02/21:rpg]
+;;                                    (puke #\])
+;;                                    ;; (push-string (eat) data)
+;;                                    ))))
+;;                     until (eql state 3)
+;;                     finally (return (make-element
+;;                                      :type 'cdata
+;;                                      :val (coerce data 'simple-string)))))))))
+
+;;; I was unable to figure out how to rejigger this backtracking lexer because
+;;; of the possible need to do multiple step backup.  Instead, for the CDATA
+;;; matching of ]]> I by hand generated an NFA, and then determinized it (also
+;;; by hand).  Then I did a simpler thing of just pushing ALL the data onto the
+;;; data string, and truncating it when done.
 (defrule comment-or-cdata ()
-  (and
-   (peek #\!)
-   (must (or (comment s)
-             (and
-              (match-seq #\[ #\C #\D #\A #\T #\A #\[)
-              (loop with data = (make-extendable-string 50)
-                    with state = 0
-                    do (case state
-                         (0 (if (match #\])
-                                (incf state)
-                                (push-string (eat) data)))
-                         (1 (if (match #\])
-                                (incf state)
-                                (progn
-                                  (setf state 0)
-                                  ;; dump the first close-bracket
-                                  (push-string #\] data)
-                                  ;; just go back to the matching process [2011/02/21:rpg]
-                                  ;; (push-string (eat) data)
-                                  )))
-                         (2 (if (match #\>)
-                                (incf state)
-                                (progn
-                                  (setf state 0)
-                                  ;; the FIRST close-bracket doesn't start a match
-                                  (push-string #\] data)
-                                  ;; start reading again from the second close-bracket, which might
-                                  ;; start a match... [2011/02/21:rpg]
-                                  (puke #\])
-                                  ;; (push-string (eat) data)
-                                  ))))
-                    until (eql state 3)
-                    finally (return (make-element
-                                     :type 'cdata
-                                     :val (coerce data 'simple-string)))))))))
+  (macrolet ((dbg (&rest args)
+               #+xmls-debug
+               `(norvig:dbg ,@args)
+               #-xmls-debug
+               nil))
+    (and
+     (peek #\!)
+     (must (or (comment s)
+               (and
+                (match-seq #\[ #\C #\D #\A #\T #\A #\[)
+                (loop with data = (make-extendable-string 50)
+                      with state = 0
+                      for char = (eat)
+                      do (push-string char data)
+                      do (case state
+                           (0
+                            (case char
+                              (#\]
+                               (dbg :cdata "State 0 Match #\], go to state {0,1} = 4.")
+                               (setf state 4))
+                              (otherwise
+                               (dbg :cdata "State 0 Non-], go to (remain in) state 0."))))
+                           (4 ; {0, 1}
+                            (case char
+                              (#\]
+                               (dbg :cdata "State 4 {0, 1}, match ], go to state {0,1,2} = 5")
+                               (setf state 5))
+                              (otherwise
+                               (dbg :cdata "State 4 {0, 1}, Non-], go to state 0.")
+                               (setf state 0))))
+                           (5 ; {0, 1, 2}
+                            (case char
+                              (#\]
+                               (dbg :cdata "State 5 {0, 1, 2}, match ], stay in state 5."))
+                              (#\>
+                               (dbg :cdata "State 5 {0, 1, 2}, match >, finish match and go to state 3.")
+                               (setf state 3))
+                              (otherwise
+                               (dbg :cdata "State 5 {0, 1, 2}, find neither ] nor >; go to state 0.")
+                               (setf state 0))))
+                           )
+                      until (eql state 3)
+                      finally (return (make-element
+                                       :type 'cdata
+                                       :val (coerce
+                                             ;; rip the ]]> off the end of the data and return it...
+                                             (subseq data 0 (- (fill-pointer data) 3))
+                                             'simple-string))))))))))
+
 
 (declaim (ftype function element))     ; forward decl for content rule
 (defrule content ()
