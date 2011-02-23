@@ -5,7 +5,7 @@
 (in-package :xmls-system)
 
 (defsystem :xmls
-    :version "1.3.1"
+    :version "1.4.1"
     :depends-on
     #+xmls-debug (:norvig)
     #-xmls-debug ()
@@ -16,6 +16,6 @@
 
 ;;; These are additional standalone tests
 (defsystem :xmls-test
-  :version "1.3.1"
+  :version "1.4.1"
   :depends-on (xmls nst)
   :components ((:file "nst-tests")))
