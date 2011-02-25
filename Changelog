@@ -1,5 +1,8 @@
 # $Id$
 
+1.4.1
+    * Fixed bugs in parsing CDATA that could cause crashes in the parser.#
+
 1.4
     * Thanks to Norman Werner, fixed bug in handling of multi-byte characters.
 
