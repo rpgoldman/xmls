@@ -11,6 +11,7 @@
            make-xmlrep xmlrep-add-child!
            xmlrep-tag xmlrep-tagmatch
            xmlrep-attribs xmlrep-children
+           xmlrep-string-child xmlrep-integer-child
            xmlrep-find-child-tags xmlrep-find-child-tag
            xmlrep-attrib-value
            xmlrep-boolean-attrib-value))

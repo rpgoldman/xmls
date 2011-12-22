@@ -30,6 +30,15 @@
 (defun xmlrep-children (treenode)
   (cddr treenode))
 
+(defun xmlrep-string-child (treenode)
+  (let ((children (xmlrep-children treenode)))
+    (if (and (eq (length children) 1) (typep (first children) 'string))
+        (first children)
+        (error "Cound't find value of ~A" treenode))))
+
+(defun xmlrep-integer-child (treenode)
+  (parse-integer (xmlrep-string-child treenode)))
+
 (defun xmlrep-find-child-tags (tag treenode)
   "Find all the children of TREENODE with TAG."
   (remove-if-not #'(lambda (child) (xmlrep-tagmatch tag child))
