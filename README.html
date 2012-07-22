@@ -48,7 +48,7 @@
   </li>
 </ul>
 
-<h2>Xml Representation</h2>
+<h2>XML Representation</h2>
 
 <p>
   Parsed xml is represented as a lisp list.  A node is represented as follows:
@@ -173,7 +173,7 @@ Would parse as:
 </code>
 </dt>
   <dd>Extract the tag from XMLREP.</dd>
-<dt><a name="xmlrep-tagmatch"><code>xmlrep-tagmatch (tag treenode)</code></a>
+<dt><code>xmlrep-tagmatch (tag treenode)</code>
 </dt>
 <dd>Returns true if TAG is the tag of TREENODE.  Match is
   case <em>insensitive</em> (quite possibly this is the Wrong Thing). </dd>
@@ -200,6 +200,23 @@ Would parse as:
 </dt>
 <dd>Find a <em>single</em> child of TREENODE with TAG.  Returns an error
 if there is more or less than one such child.</dd>
+<dl>
+  <dt><code>
+    xmlrep-string-child (treenode)
+    </code></dt>
+  <dd>Find the <em>single</em> string-valued child of TREENODE.  Returns an
+    error if there is more than one child, or if a single child is not
+    string-valued.</dd>
+</dl>
+<dl>
+  <dt><code>
+    xmlrep-integer-child (treenode)
+    </code></dt>
+  <dd>Find the <em>single</em> child of TREENODE whose value is a string that
+    can be parsed into an integer.  Returns an
+    error if there is more than one child, or if a single child is not
+   appropriately valued.</dd>
+</dl>    
 <dt><code>
     xmlrep-attrib-value (attrib treenode
     &optional (if-undefined :error))
