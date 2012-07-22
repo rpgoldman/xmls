@@ -725,7 +725,7 @@ character translation."
   ;;(sb-profile:profile "XMLS")
   #+cmu(extensions:gc-off) ;; too noisy
   (dolist (test
-            #-ccl
+           #-ccl
            (cdr
             #+sbcl sb-ext:*posix-argv*
             #+abcl extensions:*command-line-argument-list*
@@ -746,15 +746,15 @@ character translation."
                 (if (parse (open test))
                     (format t "ok~%")
                     (format t "FAILED!~%"))))))))
-      (handler-bind ((error #'(lambda (c)
-                              (format t "FAILED with error:~%~S~%" c)
-                              (throw 'test-failure nil))))
-        (catch 'test-failure
-          (format t "~40A" "Escaped writing...")
-          (force-output)
-          (with-output-to-string (str)
-          (write-escaped "ÄΩ" str))
-          (format t "ok~%")))
+  (handler-bind ((error #'(lambda (c)
+                            (format t "FAILED with error:~%~S~%" c)
+                            (throw 'test-failure nil))))
+    (catch 'test-failure
+      (format t "~40A" "Escaped writing...")
+      (force-output)
+      (with-output-to-string (str)
+        (write-escaped "ÄΩ" str))
+      (format t "ok~%")))
   ;;(sb-profile:report)
   #+abcl (extensions:quit)
   #+ccl (ccl:quit)
