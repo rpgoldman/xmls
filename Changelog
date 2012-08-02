@@ -2,6 +2,8 @@
 
 1.5
     * Added helpers to parse string and integer content in an element.
+    * Now testable with clisp.
+    * Fix unicode bug loading with SBCL.
 
 1.4.1
     * Fixed bugs in parsing CDATA that could cause crashes in the parser.#

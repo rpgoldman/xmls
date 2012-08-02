@@ -12,15 +12,24 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
 <body> 
 
 <h1>XMLS, a simple XML parser for Common Lisp</h1> 
-<h2>Downloads</h2> 
+<h2>Downloads</h2>
+
 <table>
+  <tr> 
+    <td><span style="color: red">latest --></span> Better support for Unicode.</td>
+    <td>xmls-1.5</td> 
+    <td><a href="xmls-1.5.tar.gz">source</a></td> 
+    <td><a href="xmls-1.5.tar.gz.asc">signature</a></td> 
+    <td><a href="xmls-1.5.tar.gz.md5">md5</a></td> 
+    <td><a href="latest/Changelog">changelog</a></td> 
+  </tr> 
+
   <tr> 
     <td><span style="color: red">latest --></span> Better support for Unicode.</td>
     <td>xmls-1.4</td> 
     <td><a href="xmls-1.4.tar.gz">source</a></td> 
     <td><a href="xmls-1.4.tar.gz.asc">signature</a></td> 
     <td><a href="xmls-1.4.tar.gz.md5">md5</a></td> 
-    <td><a href="latest/Changelog">changelog</a></td> 
   </tr> 
 
   <tr> 
