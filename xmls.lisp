@@ -720,17 +720,19 @@ character translation."
 ;;(trace end-tag comment comment-or-doctype content name xmldecl misc)
 ;;(trace processing-instruction processing-instruction-or-xmldecl element start-tag ws element-val)
 
-#+(or sbcl cmu allegro abcl ccl)
+#+(or sbcl cmu allegro abcl ccl clisp)
 (defun test ()
   ;;(sb-profile:profile "XMLS")
   #+cmu(extensions:gc-off) ;; too noisy
+  #+clisp (pprint ext:*args*)
   (dolist (test
-           #-ccl
+           #-(or ccl clisp)
            (cdr
             #+sbcl sb-ext:*posix-argv*
             #+abcl extensions:*command-line-argument-list*
             #+cmu (subseq extensions:*command-line-strings* 4)
             #+allegro (sys:command-line-arguments))
+           #+clisp ext:*args*
            #+ccl
            ccl:*unprocessed-command-line-arguments*)
     (handler-bind ((error #'(lambda (c)

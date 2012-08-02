@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 # $Id$
 
 FORM="(xmls::test)"
@@ -54,6 +54,12 @@ while [ $# -gt 0 ]; do
             ;;
         --sbcl)
             # the default...
+            shift
+            ;;
+        --clisp)
+            command="${CLISP:-clisp}"
+            CMDLINE="${command} -norc -ansi -i xmls -i xmlrep-helpers -x"
+            SEPARATOR="--"
             shift
             ;;
         --all)
