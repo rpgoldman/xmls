@@ -542,6 +542,7 @@ character translation."
 ;;; data string, and truncating it when done.
 (defrule comment-or-cdata ()
   (macrolet ((dbg (&rest args)
+               (declare (ignorable args))
                #+xmls-debug
                `(norvig:dbg ,@args)
                #-xmls-debug
@@ -760,6 +761,6 @@ character translation."
   ;;(sb-profile:report)
   #+abcl (extensions:quit)
   #+ccl (ccl:quit)
-  #+sbcl (sb-ext:quit)
+  #+sbcl (sb-ext:exit :code 0)
   #+cmu(extensions:quit)
   #+allegro(excl:exit))
