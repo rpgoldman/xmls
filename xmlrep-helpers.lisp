@@ -88,8 +88,7 @@ the attrib name (a string) and its value."
   
 (defun (setf xmlrep-attrib-value) (value attrib treenode)
   ;; ideally, we would check this...
-  (let ((old-attribs (xmlrep-attribs treenode))
-        (old-val (xmlrep-attrib-value attrib treenode nil)))
+  (let ((old-val (xmlrep-attrib-value attrib treenode nil)))
     (if old-val
         (cond ((null value)
                ;; just delete this attribute...
@@ -109,9 +108,9 @@ the attrib name (a string) and its value."
                      (append (xmlrep-attribs treenode)
                              (list (list attrib value))))
                value)))))
-                  
+
 (defun xmlrep-boolean-attrib-value (attrib treenode
-                            &optional (if-undefined :error))
+                                    &optional (if-undefined :error))
   "Find the value of ATTRIB, a string, in TREENODE.
 The value should be either \"true\" or \"false\".  The
 function will return T or NIL, accordingly.  If there is no ATTRIB,
