@@ -16,7 +16,7 @@
     (call-next-method)))
 
 (defsystem :xmls
-    :version "1.5.1"
+    :version "1.6"
     :depends-on
     #+xmls-debug (:norvig)
     #-xmls-debug ()

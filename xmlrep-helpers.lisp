@@ -27,8 +27,14 @@
 (defun xmlrep-attribs (treenode)
   (node-attrs treenode))
 
+(defun (setf xmlrep-attribs) (attribs treenode)
+  (setf (node-attrs treenode) attribs))
+
 (defun xmlrep-children (treenode)
   (cddr treenode))
+
+(defun (setf xmlrep-children) (children treenode)
+  (setf (cddr treenode) children))
 
 (defun xmlrep-string-child (treenode)
   (let ((children (xmlrep-children treenode)))
@@ -63,9 +69,7 @@ if there is more or less than one such child."
   "Find the value of ATTRIB, a string, in TREENODE.
 if there is no ATTRIB, will return the value of IF-UNDEFINED,
 which defaults to :ERROR."
-  (let ((found-attrib (find attrib (xmlrep-attribs treenode)
-                            :test #'string=
-                            :key #'car)))
+  (let ((found-attrib (find-attrib attrib treenode)))
     (cond (found-attrib
            (second found-attrib))
           ((eq if-undefined :error)
@@ -74,6 +78,38 @@ which defaults to :ERROR."
           (t
            if-undefined))))
 
+(defun find-attrib (attrib treenode)
+  "Returns the attrib CELL (not the attrib value) from 
+TREENODE, if found.  This cell will be a list of length 2,
+the attrib name (a string) and its value."
+  (find attrib (xmlrep-attribs treenode)
+        :test #'string=
+        :key #'car))
+  
+(defun (setf xmlrep-attrib-value) (value attrib treenode)
+  ;; ideally, we would check this...
+  (let ((old-attribs (xmlrep-attribs treenode))
+        (old-val (xmlrep-attrib-value attrib treenode nil)))
+    (if old-val
+        (cond ((null value)
+               ;; just delete this attribute...
+               (setf (xmlrep-attribs treenode)
+                     (remove attrib (xmlrep-attribs treenode)
+                             :test #'string=
+                             :key #'first))
+               nil)
+              (t (let ((cell (find-attrib attrib treenode)))
+                   (setf (second cell) value)
+                   value)))
+        ;; no old value
+        (cond ((null value)
+               nil)                         ; no old value to delete
+              (t
+               (setf (xmlrep-attribs treenode)
+                     (append (xmlrep-attribs treenode)
+                             (list (list attrib value))))
+               value)))))
+                  
 (defun xmlrep-boolean-attrib-value (attrib treenode
                             &optional (if-undefined :error))
   "Find the value of ATTRIB, a string, in TREENODE.
