@@ -9,20 +9,19 @@
   (:documentation "Component class to quash some ACL warnings.")
   )
 
-#+allegro
-(defmethod perform :around ((op compile-op) (file xmls-source-file))
-  "Quash ACL warning about nested reader macros."
-  (let ((excl:*warn-on-nested-reader-conditionals* nil))
-    (call-next-method)))
-
+;#+allegro
+;(defmethod perform :around ((op compile-op) (file xmls-source-file))
+;  "Quash ACL warning about nested reader macros."
+;  (let ((excl:*warn-on-nested-reader-conditionals* nil))
+;    (call-next-method)))
+;
 (defsystem :xmls
     :version "1.6"
     :depends-on
     #+xmls-debug (:norvig)
     #-xmls-debug ()
     :components ((:file "xmls"
-                        #+asdf-unicode #+asdf-unicode
-                        :encoding :utf-8)
+                        #+asdf-unicode :encoding #+asdf-unicode :utf-8)
                  (:file "xmlrep-helpers"
                         ;; package is defined in XMLS. [2009/02/24:rpg]
                         :depends-on ("xmls"))))
