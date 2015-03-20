@@ -1,5 +1,8 @@
 # $Id$
 
+1.6
+    * Added write-prologue.
+
 1.5
     * Added helpers to parse string and integer content in an element.
     * Now testable with clisp.

@@ -127,6 +127,20 @@ Would parse as:
 </p>
 
 <pre>
+(write-prologue xml-decl doctype stream)
+</pre>
+
+<p>
+  write-prologue writes the leading
+  <code>&lt;?xml ... ?&gt;</code> and <code>&lt;!DOCTYPE ... &gt;</code>
+  elements to <code>stream</code>.
+  <code>xml-decl</code> is an alist of attribute name value pairs.
+  Valid xml-decl attributes per the xml spec are "version", "encoding",
+  and "standalone", though write-prologue does not verify this.
+  <code>doctype</code> is a string containing the document type definition.
+</p>
+
+<pre>
 (write-xml xml stream &amp;key (indent nil))
 </pre>
 

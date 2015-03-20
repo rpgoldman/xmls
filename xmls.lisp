@@ -7,6 +7,7 @@
 (defpackage xmls
   (:use :cl) ; :cl-user
   (:export node-name node-ns node-attrs node-children make-node parse toxml write-xml
+           write-prologue
            ;; additional helpers from Robert P. Goldman
            make-xmlrep xmlrep-add-child!
            xmlrep-tag xmlrep-tagmatch
@@ -700,6 +701,15 @@ character translation."
   (if (null s)
       (toxml e :indent indent)
     (generate-xml e s (if indent 1 0))))
+
+(defun write-prologue (xml-decl doctype s)
+  "Render the leading <?xml ... ?> and <!DOCTYPE ... > tags to an xml stream."
+  (format s "<?xml")
+  (dolist (attrib xml-decl)
+    (format s " ~A=\"~A\"" (car attrib) (cdr attrib)))
+  (format s " ?>~%")
+  (when doctype
+    (format s "<!DOCTYPE ~A>~%" doctype)))
 
 (defun toxml (e &key (indent nil))
   "Renders a lisp node tree to an xml string."
