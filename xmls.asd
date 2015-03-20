@@ -16,20 +16,22 @@
 ;    (call-next-method)))
 ;
 (defsystem :xmls
-    :version "1.6"
-    :depends-on
-    #+xmls-debug (:norvig)
-    #-xmls-debug ()
+    :version "1.7"
+    :in-order-to ((test-op (test-op "xmls/test")))
     :components ((:file "xmls"
                         #+asdf-unicode :encoding #+asdf-unicode :utf-8)
                  (:file "xmlrep-helpers"
                         ;; package is defined in XMLS. [2009/02/24:rpg]
                         :depends-on ("xmls"))))
 
-;;; These are additional standalone tests
-;;; As far as I can tell, this system is a no-op, because there is no PERFORM method
-;;; for TEST-OP here, nor does test-op on XMLS invoke this system. [2012/07/21:rpg]
-(defsystem :xmls-test
-  :version "1.5.1"
-  :depends-on (xmls nst)
-  :components ((:file "nst-tests")))
+(defsystem :xmls/test
+  :perform (test-op (op c)
+              (declare (ignorable op c))
+              (uiop:symbol-call :xmls :test t))
+  :depends-on (xmls))
+
+
+
+
+
+

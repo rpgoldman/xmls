@@ -1,7 +1,9 @@
 # $Id$
 
+1.7
+    * Added write-prologue and write-prolog.
+
 1.6
-    * Added write-prologue.
 
 1.5
     * Added helpers to parse string and integer content in an element.
