@@ -205,7 +205,7 @@
          (progn
            (write-char #\> s)
            (if (> indent 0) (write-char #\Newline s))
-           (mapcan (lambda (c) (generate-xml c s indent)) (node-children e))
+           (mapc #'(lambda (c) (generate-xml c s indent)) (node-children e))
            (if (> indent 0)
                (progn
                  (dotimes (i (* 2 (- indent 2)))
