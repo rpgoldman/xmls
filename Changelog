@@ -1,5 +1,8 @@
 # $Id$
 
+1.7.1
+	* Fixed a bug that caused breakage on Lispworks.
+
 1.7
     * Added write-prologue and write-prolog.
 

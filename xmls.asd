@@ -16,7 +16,7 @@
 ;    (call-next-method)))
 ;
 (defsystem :xmls
-    :version "1.7"
+    :version "1.7.1"
     :in-order-to ((test-op (test-op "xmls/test")))
     :components ((:file "xmls"
                         #+asdf-unicode :encoding #+asdf-unicode :utf-8)
