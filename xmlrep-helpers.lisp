@@ -13,10 +13,12 @@
 (in-package :xmls)
 
 (defun make-xmlrep (tag &key attribs children)
-  `(,tag ,attribs ,@children))
+  (make-node :name tag :attrs attribs :children children))
 
 (defun xmlrep-add-child! (xmlrep child)
-  (nconc xmlrep (list child)))
+  (setf (node-children xmlrep)
+        (append (node-children xmlrep)
+                (list child))))
 
 (defun xmlrep-tag (treenode)
   (node-name treenode))
@@ -31,10 +33,10 @@
   (setf (node-attrs treenode) attribs))
 
 (defun xmlrep-children (treenode)
-  (cddr treenode))
+  (node-children treenode))
 
 (defun (setf xmlrep-children) (children treenode)
-  (setf (cddr treenode) children))
+  (setf (node-children treenode) children))
 
 (defun xmlrep-string-child (treenode)
   (let ((children (xmlrep-children treenode)))

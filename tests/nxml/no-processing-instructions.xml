@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH
+    xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2015-05-06T21:47:12Z</responseDate>
+  <request verb="GetRecord" identifier="oai:pubmedcentral.nih.gov:3902907"
+           metadataPrefix="pmc">http://www.ncbi.nlm.nih.gov/oai/oai.cgi</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>oai:pubmedcentral.nih.gov:3902907</identifier>
+        <datestamp>2014-01-27</datestamp>
+        <setSpec>nar</setSpec>
+        <setSpec>pmc-open</setSpec>
+      </header>
+      <metadata>
+        <article xmlns="http://dtd.nlm.nih.gov/2.0/xsd/archivearticle" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jats.nlm.nih.gov/archiving/1.0/xsd/JATS-archivearticle1.xsd" article-type="research-article">
+          <front>
+            <journal-meta>
+              <journal-id journal-id-type="nlm-ta">Nucleic Acids Res</journal-id>
+              <journal-id journal-id-type="iso-abbrev">Nucleic Acids Res</journal-id>
+              <journal-id journal-id-type="publisher-id">nar</journal-id>
+              <journal-id journal-id-type="hwp">nar</journal-id>
+              <journal-title-group>
+                <journal-title>Nucleic Acids Research</journal-title>
+              </journal-title-group>
+              <issn pub-type="ppub">0305-1048</issn>
+              <issn pub-type="epub">1362-4962</issn>
+              <publisher>
+                <publisher-name>Oxford University Press</publisher-name>
+              </publisher>
+            </journal-meta>
+          </front>
+        </article>
+      </metadata>
+    </record>
+  </GetRecord>
+</OAI-PMH>

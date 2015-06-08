@@ -6,7 +6,16 @@
 
 (defpackage xmls
   (:use :cl) ; :cl-user
+  (:shadow #:read-char #:unread-char)
   (:export node-name node-ns node-attrs node-children make-node parse toxml write-xml
+           node-p nodelist->node
+           node->nodelist
+
+           ;; processing instruction objects
+           proc-inst-p
+           proc-inst-target
+           proc-inst-contents
+
            write-prologue
            write-prolog
            ;; additional helpers from Robert P. Goldman
@@ -30,6 +39,7 @@
 (defvar *strip-comments* t)
 (defvar *compress-whitespace* t)
 (defvar *test-verbose* nil)
+(defvar *discard-processing-instructions*)
 (defvar *entities*
   #(("lt;" #\<)
     ("gt;" #\>)
@@ -59,49 +69,94 @@
      finally (return table))
     table))
 
+;;;---------------------------------------------------------------------------
+;;; DYNAMIC VARIABLES
+;;;---------------------------------------------------------------------------
+(defvar *parser-stream* nil
+  "The currently-being-parsed stream. Used so that we can appropriately track
+the line number.")
+(defvar *parser-line-number* nil)
+
+
+
 ;;;-----------------------------------------------------------------------------
 ;;; CONDITIONS
 ;;;-----------------------------------------------------------------------------
 (define-condition xml-parse-error (error)
   ((line :initarg :line
-         :reader error-line)))
+         :initform nil
+         :reader error-line))
+  (:report (lambda (xpe stream)
+             (format stream "XML-PARSE-ERROR~@[ at line ~d~]"
+                     (error-line xpe)))))
+
+(defmethod initialize-instance :after ((obj xml-parse-error) &key)
+  (unless (slot-value obj 'line)
+    (when *parser-line-number*
+      (setf (slot-value obj 'line) *parser-line-number*))))
 
 ;;;-----------------------------------------------------------------------------
 ;;; NODE INTERFACE
 ;;;-----------------------------------------------------------------------------
+(defstruct (node (:constructor %make-node))
+  name
+  ns
+  attrs
+  children)
+  
 (defun make-node (&key name ns attrs child children)
   "Convenience function for creating a new xml node."
-  (list* (if ns (cons name ns) name)
-         attrs
-         (if child
-             (list child)
-             children)))
+  (when (and child children)
+    (error "Cannot specify both :child and :children for MAKE-NODE."))
+  (let ((children (if child
+                      (list child)
+                    children)))
+    (%make-node :name name :ns ns
+                :children children
+                :attrs attrs)))
 
-(defun node-name (elem)
-  (if (consp (car elem))
-      (caar elem)
-      (car elem)))
+(defun nodelist->node (nodelist)
+  "Take old-style list representation of XMLS nodes and translate it
+into a NODE."
+  (if (stringp nodelist)
+      ;; child is a string -- a literal child
+      ;; FIXME: is that the right XML jargon?
+      nodelist
+      (make-node :name (if (consp (car nodelist))
+                           (caar nodelist)
+                           (car nodelist))
+                 :ns (if (consp (car nodelist))
+                         (cdar nodelist)
+                         nil)
+                 :children (mapcar 'nodelist->node (cddr nodelist))
+                 :attrs (second nodelist))))
 
-(defun node-ns (elem)
-  (if (consp (car elem))
-      (cdar elem)
-      nil))
+(defun node->nodelist (node)
+  "Backwards compatibility function.  Will take a NODE \(the output of
+PARSE\), and translate it into a list structure that looks like the
+output of PARSE from XMLS 1.x.  This should only be needed if there's
+client code that didn't obey the API and instead directly accessed the
+Lisp list structures that XMLS used to produce. Such code should be
+fixed."
+  (etypecase node
+      (string node)
+      (node
+       (list* (if (node-ns node) (cons (node-name node) (node-ns node))
+                  (node-name node))
+              (node-attrs node)
+              (mapcar 'node->nodelist (node-children node))))))
+  
 
-(defun (setf node-ns) (ns elem)
-  (setf (car elem)
-        (cons (node-name elem) ns)))
+;;;-----------------------------------------------------------------------------
 
-(defun node-attrs (elem) (second elem))
+;;;---------------------------------------------------------------------------
+;;; XML Processing Instruction
+;;;---------------------------------------------------------------------------
+(defstruct proc-inst
+  (target "" :type string)
+  (contents "" :type string)
+  )
 
-(defun (setf node-attrs) (attrs elem)
-  (setf (second elem) attrs))
-
-(defun node-children (elem)
-  (cddr elem))
-
-(defun (setf node-children) (children elem)
-  (rplacd (cdr elem) children)
-  (node-children elem))
 
 ;;;-----------------------------------------------------------------------------
 ;;; UTILITY FUNCTIONS
@@ -185,7 +240,7 @@
   "Renders a lisp node tree to an xml string stream."
   (if (> indent 0) (incf indent))
   (etypecase e
-    (list
+    (node
      (progn
        (dotimes (i (* 2 (- indent 2)))
          (write-char #\Space s))
@@ -266,6 +321,34 @@ character translation."
               do (push-string char ent)
               until (char= char #\;)
               finally (return (resolve-entity (coerce ent 'simple-string)))))))
+
+;;;---------------------------------------------------------------------------
+;;; Shadow READ-CHAR and UNREAD-CHAR so we can count lines while we parse...
+;;;---------------------------------------------------------------------------
+(defun read-char (&optional (stream *standard-input*) (eof-error-p t) eof-value recursive-p)
+  (let ((eof-p nil))
+    (let ((c
+            (catch 'char-return
+              (handler-bind
+                  ((end-of-file
+                     #'(lambda (e)
+                         (declare (ignore e))
+                         (unless eof-error-p
+                           (setf eof-p t)
+                           (throw 'char-return eof-value)))))
+                (common-lisp:read-char stream t nil recursive-p)))))
+    (when (and (eq stream *parser-stream*)
+               (not eof-p)
+               (char= c #\newline))
+      (incf *parser-line-number*))
+    c)))
+
+(defun unread-char (char &optional (stream *standard-input*))
+  (when (char= char #\newline)
+    (decf *parser-line-number*))
+  (common-lisp:unread-char char stream))
+    
+;;;END shadowing--------------------------------------------------------------
 
 (define-symbol-macro next-char (peek-stream (state-stream s)))
 
@@ -514,57 +597,9 @@ character translation."
      t)
    (make-element :type 'comment)))
 
-;;; the following is buggy, because it does not properly back up when it gets a
-;;; mismatch.  An example buggy string is: "<name><![CDATA[x]]]></name>"
-;;; [2011/02/21:rpg]
-;; (defrule comment-or-cdata ()
-;;   (and
-;;    (peek #\!)
-;;    (must (or (comment s)
-;;              (and
-;;               (match-seq #\[ #\C #\D #\A #\T #\A #\[)
-;;               (loop with data = (make-extendable-string 50)
-;;                     with state = 0
-;;                     do (case state
-;;                          (0 (cond ((match #\])
-;;                                    (dbg :cdata "Match #\], go to state 1.")
-;;                                    (incf state))
-;;                                   (t
-;;                                    (push-string (eat) data))))
-;;                          (1 (cond ((match #\])
-;;                                    (dbg :cdata "Match second #\], go to state 2.")
-;;                                    (incf state))
-;;                                   (t
-;;                                    (dbg :cdata "Fail to match second #\], go to state 0.")
-;;                                    (setf state 0)
-;;                                    ;; dump the first close-bracket
-;;                                    (push-string #\] data)
-;;                                    ;; just go back to the matching process [2011/02/21:rpg]
-;;                                    ;; (push-string (eat) data)
-;;                                    )))
-;;                          (2 (cond ((match #\>)
-;;                                    (dbg :cdata "Finish closing of CDATA.")
-;;                                    (incf state))
-;;                                   (t
-;;                                    (dbg :cdata "Fail to find >, return to state 0.")
-;;                                    (setf state 0)
-;;                                    ;; the FIRST close-bracket doesn't start a match
-;;                                    (push-string #\] data)
-;;                                    ;; start reading again from the second close-bracket, which might
-;;                                    ;; start a match... [2011/02/21:rpg]
-;;                                    (puke #\])
-;;                                    ;; (push-string (eat) data)
-;;                                    ))))
-;;                     until (eql state 3)
-;;                     finally (return (make-element
-;;                                      :type 'cdata
-;;                                      :val (coerce data 'simple-string)))))))))
-
-;;; I was unable to figure out how to rejigger this backtracking lexer because
-;;; of the possible need to do multiple step backup.  Instead, for the CDATA
-;;; matching of ]]> I by hand generated an NFA, and then determinized it (also
-;;; by hand).  Then I did a simpler thing of just pushing ALL the data onto the
-;;; data string, and truncating it when done.
+;;; For the CDATA matching of ]]> I by hand generated an NFA, and then
+;;; determinized it (also by hand).  Then I did a simpler thing of just pushing
+;;; ALL the data onto the data string, and truncating it when done.
 (defrule comment-or-cdata ()
   (and
    (peek #\!)
@@ -615,6 +650,7 @@ character translation."
 (defrule content ()
   (if (match #\<)
       (must (or (comment-or-cdata s)
+                (processing-instruction s)
                 (element s)
                 (end-tag s)))
       (or (let (content)
@@ -644,8 +680,13 @@ character translation."
              while c
              do (etypecase c
                   (element (case (element-type c)
-                             ('end-tag
+                             (end-tag
                               (return (setf end-name (element-val c))))
+                             ;; processing instructions may be discarded
+                             (pi
+                              (unless *discard-processing-instructions*
+                                (when (element-val c)
+                                  (push (element-val c) children))))
                              (t (if (element-val c)
                                     (push (element-val c) children)))))))
        (string= (node-name elem) end-name)))
@@ -654,26 +695,55 @@ character translation."
        (setf (node-children elem) (nreverse children))
        (make-element :type 'elem :val elem)))))
 
-(defrule processing-instruction-or-xmldecl ()
-  (let (name)
+(defrule processing-instruction ()
+  (let (name contents)
     (and
      (match #\?)
      (setf name (name s))
-     (none-or-more s #'ws-attr-or-nsdecl)
-     (match-seq #\? #\>)
-     (make-element :type 'pi :val name))))
+     (not (string= name "xml"))
+     ;; contents of a processing instruction can be arbitrary stuff, as long
+     ;; as it doesn't contain ?>...
+     (setf contents (pi-contents s))
+     ;; if we get here, we have eaten ?> off the input in the course of
+     ;; processing PI-CONTENTS
+     (make-element :type 'pi :val (make-proc-inst :target name :contents contents)))))
 
-(defrule processing-instruction ()
-  (let ((p (processing-instruction-or-xmldecl s)))
-    (and p
-         (not (string= (element-val p) "xml"))
-         p)))
+(defrule pi-contents ()
+  (loop with data = (make-extendable-string 50)
+         with state = 0
+         for char = (eat)
+         do (push-string char data)
+         do (ecase state
+              (0
+               (case char
+                 (#\?
+                  (dbg :pi-contents "State 0 Match #\?, go to state 1.")
+                  (setf state 1))
+                 (otherwise
+                  (dbg :pi-contents "State 0 ~c, go to (remain in) state 0." char))))
+              (1
+               (case char
+                 (#\>
+                  (dbg :pi-contents "State 1 Match #\>, done.")
+                  (setf state 2))
+                 (otherwise
+                  (dbg :pi-contents "State 1, ~c, do not match #\>, return to 0." char)
+                  (setf state 0)))))
+         until (eql state 2)
+         finally (return (coerce
+                          ;; rip the ?> off the end of the data and return it...
+                          (subseq data 0 (max 0 (- (fill-pointer data) 2)))
+                          'simple-string))))
 
 (defrule xmldecl ()
-  (let ((p (processing-instruction-or-xmldecl s)))
-    (and p
-         (string= (element-val p) "xml")
-         p)))
+    (let (name contents)
+    (and
+     (match #\?)
+     (setf name (name s))
+     (string= name "xml")
+     (setf contents (none-or-more s #'ws-attr-or-nsdecl))
+     (match-seq #\? #\>)
+     (make-element :type 'xmldecl :val contents))))
 
 (defrule comment-or-doctype ()
   ;; skip dtd - bail out to comment if it's a comment
@@ -702,13 +772,19 @@ character translation."
 (defrule document ()
   (let (elem)
     (if (match #\<)
-        (must (or (processing-instruction-or-xmldecl s)
+        (must (or (xmldecl s)
                   (comment-or-doctype s)
                   (setf elem (element s)))))
+    ;; NOTE: I don't understand this: it seems to parse arbitrary crap
     (unless elem
       (loop for c = (misc s)
-            while c do (if (eql (element-type c) 'elem)
-                           (return (setf elem c)))))
+            while c
+            do (cond ((eql (element-type c) 'elem)
+                      (return (setf elem c)))
+                     ((and (eql (element-type c) 'pi)
+                           (not *discard-processing-instructions*))
+                      (return (setf elem c))))))
+                       
     (and elem (element-val elem))))
 
 ;;;-----------------------------------------------------------------------------
@@ -737,22 +813,22 @@ character translation."
   (with-output-to-string (s)
     (write-xml e s :indent indent)))
 
-(defun parse (s &key (compress-whitespace t))
+(defun parse (s &key (compress-whitespace t) (quash-errors t))
   "Parses the supplied stream or string into a lisp node tree."
-  (let ((*compress-whitespace* compress-whitespace)
-        (stream
-         (etypecase s
-           (string (make-string-input-stream s))
-           (stream s))))
-    (handler-case
-        (document (make-state :stream stream))
-      (end-of-file () nil)
-      (xml-parse-error () nil))))
-
-#+nil
-(progn
-  (trace end-tag comment comment-or-doctype content name xmldecl misc)
-  (trace processing-instruction processing-instruction-or-xmldecl element start-tag ws element-val))
+  (let* ((*compress-whitespace* compress-whitespace)
+         (*discard-processing-instructions* t)
+         (stream
+           (etypecase s
+             (string (make-string-input-stream s))
+             (stream s)))
+         (*parser-stream* stream)
+         (*parser-line-number* 1))
+    (if quash-errors
+        (handler-case
+            (document (make-state :stream stream))
+          (end-of-file () nil)
+          (xml-parse-error () nil))
+        (document (make-state :stream stream)))))
 
 #+(or sbcl cmu allegro abcl ccl clisp)
 (defun test (&optional interactive)

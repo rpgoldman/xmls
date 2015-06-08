@@ -37,8 +37,26 @@ GetOptions ( "abcl" => \&lisp_handler,
              "all" => \&set_all_tests,
              );
 
+if ($help) {
+  print $usage;
+  exit 0;
+}
+
 unless ( $TESTS ) {
     set_all_tests();
+}
+
+# FIXME: need to figure out how to help the script find FIVEAM...
+# run the unit tests, too...
+{
+  my $checkval = system "$CMDLINE \"(if (ignore-errors (asdf:find-system :fiveam)) (uiop:quit 0) (uiop:quit 1))\" $SEPARATOR $TESTS";
+  if ($checkval == 0) {
+    my $command =  "$CMDLINE \"(asdf:test-system :xmls)\" $SEPARATOR $TESTS";
+    print "$command\n" if $verbose;
+    system $command;
+  } else {
+    print STDERR "\n\n****************************************\nCannot find FIVEAM test system: not running unit tests, only whole-system test.\n****************************************\n\n";
+  }
 }
 
 { my $command =  "$CMDLINE \"$FORM\" $SEPARATOR $TESTS";

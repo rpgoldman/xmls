@@ -16,8 +16,8 @@
 ;    (call-next-method)))
 ;
 (defsystem :xmls
-    :version "1.7.1"
-    :in-order-to ((test-op (test-op "xmls/test")))
+    :version "2.0"
+    :in-order-to ((test-op (test-op "xmls/test") (test-op "xmls/unit-test")))
     :components ((:file "xmls"
                         #+asdf-unicode :encoding #+asdf-unicode :utf-8)
                  (:file "xmlrep-helpers"
@@ -29,6 +29,13 @@
               (declare (ignorable op c))
               (uiop:symbol-call :xmls :test t))
   :depends-on (xmls))
+
+(defsystem xmls/unit-test
+    :depends-on (xmls fiveam)
+  :perform (test-op (op c)
+              (declare (ignorable op c))
+              (uiop:symbol-call :fiveam :run! (uiop:find-symbol* '#:xmls-test :xmls-test)))
+  :components ((:file "fiveam-tests")))
 
 
 
