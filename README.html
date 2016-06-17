@@ -1,5 +1,8 @@
+<!DOCTYPE html>
 <html>
-<head/>
+<head>
+  <title>XMLS: Common Lisp XML Parser</title>
+</head>
 <body>
 <h1>XMLS</h1>
 
@@ -144,7 +147,7 @@ Would parse as:
 (write-prolog xml-decl doctype stream)
 </pre>
 <p>
-U.S. spelling alternative to <pre>write-prologue</pre>.
+U.S. spelling alternative to <code>write-prologue</code>.
 </p>
 
 <pre>
@@ -179,83 +182,90 @@ U.S. spelling alternative to <pre>write-prologue</pre>.
 
 <dl>
   <dt><code>
-      make-xmlrep  (tag &key attribs children)
+      make-xmlrep  (tag &amp;key attribs children)
   </code>
   </dt>
   <dd>Constructor function.</dd>
 
-<dt><code>
-    xmlrep-add-child! (xmlrep child)
-</code>
-</dt>
-<dd>Add a new child node to the XMLREP node.</dd>
-<dt><code>
-    xmlrep-tag (xmlrep)
-</code>
-</dt>
+  <dt>
+    <code>xmlrep-add-child! (xmlrep child)</code>
+  </dt>
+  <dd>Add a new child node to the XMLREP node.</dd>
+
+  <dt>
+    <code>xmlrep-tag (xmlrep)</code>
+  </dt>
   <dd>Extract the tag from XMLREP.</dd>
-<dt><code>xmlrep-tagmatch (tag treenode)</code>
-</dt>
-<dd>Returns true if TAG is the tag of TREENODE.  Match is
-  case <em>insensitive</em> (quite possibly this is the Wrong Thing). </dd>
-<dt><code>
-    xmlrep-attribs (xmlrep)
-</code>
-</dt>
-<dd>Extract the attributes from an XMLREP node.</dd>
-<dt><code>
-    xmlrep-children (xmlrep)
-</code>
-</dt>
-<dd>Extract the children from an XMLREP node.</dd>
-<dt><code>
-    xmlrep-find-child-tags (tag treenode)
-</code>
-</dt>
-<dd>Return all of the (direct) children of TREENODE whose tags are TAG.
-  Matching done by <a href="#xmlrep-tagmatch"><code>xmlrep-tagmatch</code></a>.
-<dt><code>
-    xmlrep-find-child-tag (tag treenode
-    &optional (if-unfound :error))
-</code>
-</dt>
-<dd>Find a <em>single</em> child of TREENODE with TAG.  Returns an error
-if there is more or less than one such child.</dd>
-<dl>
-  <dt><code>
-    xmlrep-string-child (treenode
-    &optional (if-unfound :error))
-    </code></dt>
-  <dd>Returns the <em>single</em> string-valued child of TREENODE.
+
+  <dt>
+    <code>xmlrep-tagmatch (tag treenode)</code>
+  </dt>
+  <dd>Returns true if TAG is the tag of TREENODE.  Match is
+    case <em>insensitive</em> (quite possibly this is the Wrong Thing). </dd>
+
+  <dt>
+    <code>xmlrep-attribs (xmlrep)</code>
+  </dt>
+  <dd>Extract the attributes from an XMLREP node.</dd>
+
+  <dt>
+    <code>xmlrep-children (xmlrep)</code>
+  </dt>
+  <dd>Extract the children from an XMLREP node.</dd>
+
+  <dt>
+    <code>xmlrep-find-child-tags (tag treenode)</code>
+  </dt>
+  <dd>
+    Return all of the (direct) children of TREENODE whose tags are TAG.
+    Matching done by <a href="#xmlrep-tagmatch"><code>xmlrep-tagmatch</code></a>.
+  </dd>
+  
+  <dt>
+    <code>xmlrep-find-child-tag (tag treenode &amp;optional (if-unfound :error))</code>
+  </dt>
+  <dd>
+    Find a <em>single</em> child of TREENODE with TAG.  Returns an error
+    if there is more or less than one such child.
+  </dd>
+
+  <dt>
+    <code>xmlrep-string-child (treenode &amp;optional (if-unfound :error))</code>
+  </dt>
+  <dd>
+    Returns the <em>single</em> string-valued child of TREENODE.
     If there is more than one child, or if a single child is not
-    a simple value, returns IF-UNFOUND, which defaults to :ERROR.</dd>
-</dl>
-<dl>
-  <dt><code>
-    xmlrep-integer-child (treenode)
-    </code></dt>
-  <dd>Find the <em>single</em> child of TREENODE whose value is a string that
+    a simple value, returns IF-UNFOUND, which defaults to :ERROR.
+  </dd>
+
+  <dt>
+    <code>xmlrep-integer-child (treenode)</code>
+  </dt>
+  <dd>
+    Find the <em>single</em> child of TREENODE whose value is a string that
     can be parsed into an integer.  Returns an
     error if there is more than one child, or if a single child is not
-   appropriately valued.</dd>
-</dl>    
-<dt><code>
-    xmlrep-attrib-value (attrib treenode
-    &optional (if-undefined :error))
-</code>
-</dt>
-<dd>Find the value of ATTRIB, a string, in TREENODE.
-if there is no ATTRIB, will return the value of IF-UNDEFINED,
-which defaults to :ERROR.</dd>
-<dt><code>
-    xmlrep-boolean-attrib-value (attrib treenode
-    &optional (if-undefined :error))
-</code>
-</dt>
-<dd>Find the value of ATTRIB, a string, in TREENODE.
-The value should be either "true" or "false".  The
-function will return T or NIL, accordingly.  If there is no ATTRIB,
-  will return the value of IF-UNDEFINED, which defaults to :ERROR.</dd>
+    appropriately valued.
+  </dd>
+
+  <dt>
+    <code>xmlrep-attrib-value (attrib treenode &amp;optional (if-undefined :error))</code>
+  </dt>
+  <dd>
+    Find the value of ATTRIB, a string, in TREENODE.
+    if there is no ATTRIB, will return the value of IF-UNDEFINED,
+    which defaults to :ERROR.
+  </dd>
+
+  <dt>
+    <code>xmlrep-boolean-attrib-value (attrib treenode &amp;optional (if-undefined :error))</code>
+  </dt>
+  <dd>
+    Find the value of ATTRIB, a string, in TREENODE.
+    The value should be either "true" or "false".  The
+    function will return T or NIL, accordingly.  If there is no ATTRIB,
+    will return the value of IF-UNDEFINED, which defaults to :ERROR.
+  </dd>
 </dl>
 <h2>Installation</h2>
 
