@@ -223,11 +223,12 @@ U.S. spelling alternative to <pre>write-prologue</pre>.
 if there is more or less than one such child.</dd>
 <dl>
   <dt><code>
-    xmlrep-string-child (treenode)
+    xmlrep-string-child (treenode
+    &optional (if-unfound :error))
     </code></dt>
-  <dd>Find the <em>single</em> string-valued child of TREENODE.  Returns an
-    error if there is more than one child, or if a single child is not
-    string-valued.</dd>
+  <dd>Returns the <em>single</em> string-valued child of TREENODE.
+    If there is more than one child, or if a single child is not
+    a simple value, returns IF-UNFOUND, which defaults to :ERROR.</dd>
 </dl>
 <dl>
   <dt><code>

@@ -1,5 +1,8 @@
 # $Id$
 
+1.8
+	* Added optional error suppression when items aren't found.
+
 1.7.1
 	* Fixed a bug that caused breakage on Lispworks.
 

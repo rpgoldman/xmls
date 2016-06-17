@@ -38,11 +38,14 @@
 (defun (setf xmlrep-children) (children treenode)
   (setf (node-children treenode) children))
 
-(defun xmlrep-string-child (treenode)
+(defun xmlrep-string-child (treenode &optional (if-unfound :error))
   (let ((children (xmlrep-children treenode)))
     (if (and (eq (length children) 1) (typep (first children) 'string))
         (first children)
-        (error "Cound't find value of ~A" treenode))))
+        (if (eq if-unfound :error)
+            (error "Node does not have a single string child: ~a" treenode)
+            if-unfound)
+        )))
 
 (defun xmlrep-integer-child (treenode)
   (parse-integer (xmlrep-string-child treenode)))
