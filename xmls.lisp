@@ -108,13 +108,9 @@ the line number.")
   "Convenience function for creating a new xml node."
   (when (and child children)
     (error "Cannot specify both :child and :children for MAKE-NODE."))
-  (let ((children (cond
-                    ((and child (stringp child))
-                     child)
-                    (child
-                     (list child))
-                    (t
-                     children))))
+  (let ((children (if child
+                      (list child)
+                    children)))
     (%make-node :name name :ns ns
                 :children children
                 :attrs attrs)))
