@@ -18,6 +18,7 @@
 (defsystem :xmls
     :version "2.0"
     :license "BSD"
+    :maintainer "Robert P. Goldman <rpgoldman@sift.net>"
     :in-order-to ((test-op (test-op "xmls/test") (test-op "xmls/unit-test")))
     :components ((:file "xmls"
                         #+asdf-unicode :encoding #+asdf-unicode :utf-8)
