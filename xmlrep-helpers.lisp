@@ -24,7 +24,8 @@
   (node-name treenode))
 
 (defun xmlrep-tagmatch (tag treenode)
-  (string-equal tag (xmlrep-tag treenode)))
+  (unless (stringp treenode)            ; child nodes to XMLREPs could be strings or nodes
+    (string-equal tag (xmlrep-tag treenode))))
 
 (defun xmlrep-attribs (treenode)
   (node-attrs treenode))
