@@ -20,11 +20,12 @@
 
 (defparameter *max-decl-size* 2000 ; extra gracious margin
   "XML declarations exceeding *MAX-DECL-SIZE* bytes are ignored.")
+(defvar *encoding-scanner*)
 
-(eval-when (:compile-toplevel :load-toplevel)
+(eval-when (:load-toplevel :execute)
   (let ((s "[\\s\\r]*")                 ; (#x20 | #x9 | #xD | #xA)+?
         (enc-name "[A-Za-z0-9\\._-]+")) ; [A-Za-z] ([A-Za-z0-9._] | '-')*
-    (defparameter *encoding-scanner*
+    (setf *encoding-scanner*
       ;; S 'encoding' Eq ('"' EncName '"' | "'" EncName "'")
       (create-scanner (format nil "encoding~a=~a(\"(~a)\"|'(~a)')"
                               s s enc-name enc-name)))))
