@@ -850,6 +850,7 @@ otherwise exit with an error exit status."
              ccl:*unprocessed-command-line-arguments*))
       (handler-bind ((error #'(lambda (c)
                                 (format t "FAILED with error:~%~S~%" c)
+                                (setf exit-code 1)
                                 (throw 'test-failure nil))))
                     (unless (search "CVS" test)
                       (catch 'test-failure
