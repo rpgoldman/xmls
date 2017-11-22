@@ -841,7 +841,7 @@ otherwise exit with an error exit status."
     (dolist (test
              #-(or ccl clisp)
              (cdr
-              #+sbcl sb-ext:*posix-argv*
+              #+sbcl (cdr (member "--" sb-ext:*posix-argv* :test 'equal))
               #+abcl extensions:*command-line-argument-list*
               #+cmu (subseq extensions:*command-line-strings* 4)
               #+allegro (sys:command-line-arguments))
