@@ -72,19 +72,22 @@
 
 (defun test ()
   (let* ((flux-test (asdf:system-relative-pathname
-                     :xmls/octets "tests/flux/flux-test.sexp"))
+                     :xmls/octets "octets-tests/flux/flux-test.sexp"))
          (reference (with-open-file (in flux-test)
-                          (read in))))
-    (loop for test-case in (mapcar #'(lambda (x)
-                                       (asdf:system-relative-pathname "xmls" (format nil "tests/flux/~a" x)))
+                      (read in))))
+    (loop with success-p = t
+          for test-case in (mapcar #'(lambda (x)
+                                       (asdf:system-relative-pathname "xmls" (format nil "octet-tests/flux/~a" x)))
                                    '("flux-test-iso-8859-1.xml"
-                                      #+ignore "flux-test-utf-16le.xml"
-                                      #+ignore "flux-test-utf-16be.xml"
-                                      "flux-test-utf-8.xml"))
+                                     "flux-test-utf-16le.xml"
+                                     "flux-test-utf-16be.xml"
+                                     "flux-test-utf-8.xml"))
           for parsed = (with-open-file (octets (asdf:system-relative-pathname
                                                 :xmls/octets test-case)
                                                :element-type '(unsigned-byte 8))
                          (xmls:parse (make-xml-stream octets)))
           as parsed-list = (xmls:node->nodelist parsed)
-       do (when (not (equal parsed-list reference))
-            (format *error-output* "~&Test failure: ~a~%Output was: ~s~%~%" test-case parsed)))))
+          do (when (not (equal parsed-list reference))
+               (setf success-p nil)
+               (format *error-output* "~&Test failure: ~a~%Output was: ~s~%~%" test-case parsed))
+          finally (return success-p))))
