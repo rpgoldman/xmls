@@ -44,4 +44,6 @@
   :depends-on ("xmls" "flexi-streams" "cl-ppcre")
   :perform (test-op (op c)
               (declare (ignorable op c))
-              (uiop:symbol-call :xmls/octets :test)))
+              (unless
+               (uiop:symbol-call :xmls/octets :test)
+                (error "Test failures in XMLS/octets."))))
