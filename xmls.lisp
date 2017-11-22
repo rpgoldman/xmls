@@ -830,8 +830,46 @@ character translation."
           (xml-parse-error () nil))
         (document (make-state :stream stream)))))
 
+(defparameter *test-files*
+  (mapcar #'(lambda (x) (asdf:system-relative-pathname "xmls" (format nil "tests/~a" x)))
+          (list "ant/build.xml"
+                "beep/greeting1.xml"
+                "beep/msg1.xml"
+                "cdata/cdata1.xml"
+                "char-encoding/flux-test-utf-8.xml"
+                "dav/propfind1.xml"
+                "dav/propfind2r.xml"
+                "dav/propfind3.xml"
+                "large/two_gent.xml"
+                "misc/entity.xml"
+                "misc/example.xml"
+                "misc/minimal.xml"
+                "misc/minimal1.xml"
+                "misc/minimal2.xml"
+                "misc/minimal3.xml"
+                "misc/whitespace.xml"
+                "namespace/namespace1.xml"
+                "namespace/namespace2.xml"
+                "namespace/namespace3.xml"
+                "nxml/genetics-article.xml"
+                "nxml/no-processing-instructions.xml"
+                "nxml/processing-instructions.xml"
+                "rss.xml"
+                "soap/soap1.xml"
+                "soap/soap2.xml"
+                "soap/soap3.xml"
+                "soap/soap4.xml"
+                "soap/soap5.xml"
+                "soap/soap6.xml"
+                "xml-rpc/array.xml"
+                "xml-rpc/blogger1.xml"
+                "xml-rpc/fault.xml"
+                "xml-rpc/methodCall.xml"
+                "xml-rpc/methodResponse.xml"
+                "xml-rpc/struct.xml")))
+
 #+(or sbcl cmu allegro abcl ccl clisp)
-(defun test (&optional interactive)
+(defun test (&key interactive (test-files *test-files*))
   "Run the test suite. If it fails, either return NIL \(if INTERACTIVE\),
 otherwise exit with an error exit status."
   ;;(sb-profile:profile "XMLS")
@@ -839,41 +877,47 @@ otherwise exit with an error exit status."
   #+clisp (pprint ext:*args*)
   (let ((exit-code 0))
     (dolist (test
-             #-(or ccl clisp)
-             (cdr
-              #+sbcl  (member "--" sb-ext:*posix-argv* :test 'equal)
-              #+abcl extensions:*command-line-argument-list*
-              #+cmu  (member "--" extensions:*command-line-strings* :test 'equal)
-              #+allegro (sys:command-line-arguments)
-             #+clisp ext:*args*
-             #+ccl
-             ccl:*unprocessed-command-line-arguments*))
+                (or test-files
+                    #-(or ccl clisp)
+                    (cdr
+                     #+sbcl  (member "--" sb-ext:*posix-argv* :test 'equal)
+                     #+abcl extensions:*command-line-argument-list*
+                     #+cmu  (member "--" extensions:*command-line-strings* :test 'equal)
+                     #+allegro (sys:command-line-arguments)
+                     #+clisp ext:*args*
+                     #+ccl
+                     ccl:*unprocessed-command-line-arguments*)))
+      (catch 'test-failure
+        (with-open-file (str test :direction :input)
+          (handler-bind ((error #'(lambda (c)
+                                    (format t "FAILED with error:~%~a~%" c)
+                                    (setf exit-code 1)
+                                    (throw 'test-failure nil))))
+            (if *test-verbose*
+                (let ((parsed (parse str :compress-whitespace t)))
+                  (if parsed
+                      (format t "~A~%" (toxml parsed :indent t))
+                      (progn
+                        (format t "~&Failed to parse ~A~%" test)
+                        (setf exit-code 1))))
+                (progn
+                  (format t "~40A" (concatenate 'string (namestring test) "... "))
+                  (force-output)
+                  (cond ((parse str)
+                         (format t "ok~%"))
+                        (t
+                         (setf exit-code 1)
+                         (format t "FAILED!~%")))))))))
+    (catch 'test-failure
       (handler-bind ((error #'(lambda (c)
                                 (format t "FAILED with error:~%~S~%" c)
                                 (setf exit-code 1)
                                 (throw 'test-failure nil))))
-                    (unless (search "CVS" test)
-                      (catch 'test-failure
-                        (if *test-verbose*
-                            (format t "~A~%" (toxml (parse (open test) :compress-whitespace t) :indent t))
-                          (progn
-                            (format t "~40A" (concatenate 'string test "... "))
-                            (force-output)
-                            (cond ((parse (open test))
-                                   (format t "ok~%"))
-                                  (t
-                                   (setf exit-code 1)
-                                   (format t "FAILED!~%")))))))))
-    (handler-bind ((error #'(lambda (c)
-                              (format t "FAILED with error:~%~S~%" c)
-                              (setf exit-code 1)
-                              (throw 'test-failure nil))))
-                  (catch 'test-failure
-                    (format t "~40A" "Escaped writing...")
-                    (force-output)
-                    (with-output-to-string (str)
-                                           (write-escaped "ÄΩ" str))
-                    (format t "ok~%")))
+        (format t "~40A" "Escaped writing...")
+        (force-output)
+        (with-output-to-string (str)
+          (write-escaped "ÄΩ" str))
+        (format t "ok~%")))
     (if interactive
         (zerop exit-code)
-      (uiop:quit exit-code))))
+        (uiop:quit exit-code))))

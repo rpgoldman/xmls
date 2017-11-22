@@ -29,7 +29,9 @@
 (defsystem :xmls/test
   :perform (test-op (op c)
               (declare (ignorable op c))
-              (uiop:symbol-call :xmls :test t))
+              (unless 
+                (uiop:symbol-call :xmls :test :interactive t)
+                (error "Failed XMLS test.")))
   :depends-on (xmls))
 
 (defsystem xmls/unit-test

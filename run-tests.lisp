@@ -10,6 +10,8 @@
 (ql:quickload :flexi-streams)
 (ql:quickload :fiveam)
 (ql:quickload "cl-ppcre")               ; need to do this here because it doesn't build without warnings.
+(setf asdf:*compile-file-failure-behaviour* :error)
+(setf asdf:*compile-file-warnings-behaviour* :error)
 (defvar *build-warning* nil)
 (defvar *build-error* nil)
 (catch 'build-fail
