@@ -16,7 +16,7 @@
 ;    (call-next-method)))
 ;
 (defsystem :xmls
-    :version "2.0"
+    :version "3.0"
     :license "BSD"
     :maintainer "Robert P. Goldman <rpgoldman@sift.net>"
     :in-order-to ((test-op (test-op "xmls/test") (test-op "xmls/unit-test")))
@@ -39,8 +39,9 @@
               (uiop:symbol-call :fiveam :run! (uiop:find-symbol* '#:xmls-test :xmls-test)))
   :components ((:file "fiveam-tests")))
 
-
-
-
-
-
+(defsystem :xmls/octets
+  :components ((:file "octets-xml"))
+  :depends-on ("xmls" "flexi-streams" "cl-ppcre")
+  :perform (test-op (op c)
+              (declare (ignorable op c))
+              (uiop:symbol-call :xmls/octets :test)))
