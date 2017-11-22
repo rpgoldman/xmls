@@ -53,7 +53,8 @@ unless ( $TESTS ) {
   my $command =  "$CMDLINE $EVAL \"(require :asdf)\" $EVAL \"(asdf:load-system :xmls)\" $EVAL \"$FORM\" $SEPARATOR $TESTS";
   print "$command\n" if $verbose;
   my $code = system $command;
-  if ($code) {
+  if ($code != 0) {
+    print "XMLS parsing tests failed.\n";
     exit $code
   }
 }
@@ -78,7 +79,7 @@ exit 0;
 
 our @all_tests;
 sub set_all_tests {
-    File::Find::find({wanted => \&wanted}, $FindBin::RealBin);
+    File::Find::find({wanted => \&wanted}, "$FindBin::RealBin/tests/");
     if ($verbose) {
       print STDERR "Test list is:\n";
       foreach my $test (@all_tests) {
