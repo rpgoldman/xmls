@@ -5,6 +5,7 @@ use FindBin;
 use File::Find;
 
 our $FORM = "(xmls::test)";
+our $EVAL = "--eval";
 our $SEPARATOR="";
 our $usage = <<'USAGE';
 usage: run-tests.sh [options] [tests]
@@ -20,10 +21,11 @@ options:
 USAGE
 
 our $command = $ENV{SBCL} || "sbcl";
-our $CMDLINE="${command} --no-userinit --eval \'(require :asdf)\' --eval \'(progn (load \"xmls.asd\") (asdf:load-system \"xmls\"))\' --eval";
-
+our $CMDLINE="${command} --no-userinit ";
+our $SEPARATOR="--";
 my $help = 0;
 my $verbose = 0;
+$ENV{"CL_SOURCE_REGISTRY"}=$FindBin::RealBin . ":";
 GetOptions ( "abcl" => \&lisp_handler,
              "ccl" => \&lisp_handler,
              "cmucl" => \&lisp_handler,
@@ -46,22 +48,13 @@ unless ( $TESTS ) {
     set_all_tests();
 }
 
-# FIXME: need to figure out how to help the script find FIVEAM...
-# run the unit tests, too...
 {
-  my $checkval = system "$CMDLINE \"(if (ignore-errors (asdf:find-system :fiveam)) (uiop:quit 0) (uiop:quit 1))\" $SEPARATOR $TESTS";
-  if ($checkval == 0) {
-    my $command =  "$CMDLINE \"(asdf:test-system :xmls)\" $SEPARATOR $TESTS";
-    print "$command\n" if $verbose;
-    system $command;
-  } else {
-    print STDERR "\n\n****************************************\nCannot find FIVEAM test system: not running unit tests, only whole-system test.\n****************************************\n\n";
-  }
-}
-
-{ my $command =  "$CMDLINE \"$FORM\" $SEPARATOR $TESTS";
+  my $command =  "$CMDLINE $EVAL \"(require :asdf)\" $EVAL \"(asdf:load-system :xmls)\" $EVAL \"$FORM\" $SEPARATOR $TESTS";
   print "$command\n" if $verbose;
-  system $command;
+  my $code = system $command;
+  if ($code) {
+    exit $code
+  }
 }
 
 
@@ -71,6 +64,16 @@ sub set_verbose {
     $FORM="(progn (setf xmls::*test-verbose* t)(xmls::test))";
     $verbose = 1;
 }
+
+print STDERR "Running 5AM tests.\n";
+my $cmd = "$CMDLINE --load $FindBin::RealBin/run-tests.lisp";
+print STDERR "Command for 5AM tests is:\n\t$cmd\n";
+my $code = system $cmd;
+if ($code) {
+  exit $code
+}
+print STDERR "Done running 5AM tests.\n";
+exit 0;
 
 our @all_tests;
 sub set_all_tests {
@@ -97,27 +100,31 @@ sub lisp_handler {
     my $lisp = shift;
     if ( $lisp eq "abcl" ) {
            $command=$ENV{ABCL} || "abcl";
-           $CMDLINE="${command} --noinit --noinform --eval \'(require :asdf)\' --load xmls.asd --eval \'(asdf:load-system :xmls)\' --eval";
+           $CMDLINE="${command} --noinit --noinform --eval \'(require :asdf)\' --load xmls.asd --eval \'(asdf:load-system :xmls)\' ";
        } elsif ( $lisp eq "ccl" ) {
            $command=$ENV{CCL} || "ccl";
-           $CMDLINE="${command} --no-init --quiet --eval \'(require :asdf)\' --load xmls.asd --eval '(asdf:load-system :xmls)' --eval";
+           $CMDLINE="${command} --no-init --quiet --eval \'(require :asdf)\' --load xmls.asd --eval '(asdf:load-system :xmls)' ";
            $SEPARATOR="--";
        } elsif ( $lisp eq "cmucl" ) {
            $command=$ENV{CMUCL} || "lisp";
-           $CMDLINE="${command} -eval \'(require :asdf)\' -load xmls.asd -eval \'(asdf:load-system :xmls)\' -eval";
+           $EVAL="=eval";
+           $CMDLINE="${command} -eval \'(require :asdf)\' -load xmls.asd -eval \'(asdf:load-system :xmls)\' ";
        } elsif ($lisp eq "allegro") {
            $command=$ENV{ALLEGRO} || "alisp";
-           $CMDLINE="${command} -q -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' -e";
+           $EVAL = "-e";
+           $CMDLINE="${command} -q -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        } elsif ($lisp eq "allegromodern") {
            $command=$ENV{ALLEGROMODERN} || "mlisp";
-           $CMDLINE="${command} -q -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' -e";
+           $EVAL = "-e";
+           $CMDLINE="${command} -q -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        } elsif ($lisp eq "sbcl") {
            # the default...
        } elsif ($lisp eq "clisp") {
            $command=$ENV{CLISP} || "clisp";
-           $CMDLINE="${command} -norc -ansi -x \'(require :asdf)\' -i xmls.asd -x \'(asdf:load-system :xmls)\' -x";
+           $EVAL = "-x";
+           $CMDLINE="${command} -norc -ansi -x \'(require :asdf)\' -i xmls.asd -x \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        }
 }
