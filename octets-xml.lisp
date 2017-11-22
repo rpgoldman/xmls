@@ -77,7 +77,7 @@
                       (read in))))
     (loop with success-p = t
           for test-case in (mapcar #'(lambda (x)
-                                       (asdf:system-relative-pathname "xmls" (format nil "octet-tests/flux/~a" x)))
+                                       (asdf:system-relative-pathname "xmls" (format nil "octets-tests/flux/~a" x)))
                                    '("flux-test-iso-8859-1.xml"
                                      "flux-test-utf-16le.xml"
                                      "flux-test-utf-16be.xml"
