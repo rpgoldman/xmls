@@ -841,13 +841,13 @@ otherwise exit with an error exit status."
     (dolist (test
              #-(or ccl clisp)
              (cdr
-              #+sbcl (cdr (member "--" sb-ext:*posix-argv* :test 'equal))
+              #+sbcl  (member "--" sb-ext:*posix-argv* :test 'equal)
               #+abcl extensions:*command-line-argument-list*
-              #+cmu (subseq extensions:*command-line-strings* 4)
-              #+allegro (sys:command-line-arguments))
+              #+cmu  (member "--" extensions:*command-line-strings* :test 'equal)
+              #+allegro (sys:command-line-arguments)
              #+clisp ext:*args*
              #+ccl
-             ccl:*unprocessed-command-line-arguments*)
+             ccl:*unprocessed-command-line-arguments*))
       (handler-bind ((error #'(lambda (c)
                                 (format t "FAILED with error:~%~S~%" c)
                                 (throw 'test-failure nil))))
