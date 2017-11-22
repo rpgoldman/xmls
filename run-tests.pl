@@ -23,6 +23,7 @@ USAGE
 our $command = $ENV{SBCL} || "sbcl";
 our $CMDLINE="${command} --no-userinit ";
 our $SEPARATOR="--";
+our $LOAD="--load";
 my $help = 0;
 my $verbose = 0;
 $ENV{"CL_SOURCE_REGISTRY"}=$FindBin::RealBin . ":";
@@ -66,7 +67,7 @@ sub set_verbose {
 }
 
 print STDERR "Running 5AM tests.\n";
-my $cmd = "$CMDLINE --load $FindBin::RealBin/run-tests.lisp";
+my $cmd = "$CMDLINE $LOAD $FindBin::RealBin/run-tests.lisp";
 print STDERR "Command for 5AM tests is:\n\t$cmd\n";
 my $code = system $cmd;
 if ($code) {
@@ -107,16 +108,17 @@ sub lisp_handler {
            $SEPARATOR="--";
        } elsif ( $lisp eq "cmucl" ) {
            $command=$ENV{CMUCL} || "lisp";
-           $EVAL="=eval";
-           $CMDLINE="${command} -eval \'(require :asdf)\' -load xmls.asd -eval \'(asdf:load-system :xmls)\' ";
+           $EVAL="-eval"; $LOAD="-load";
+           $CMDLINE="${command} -noinit -eval \'(require :asdf)\' -load xmls.asd -eval \'(asdf:load-system :xmls)\' ";
        } elsif ($lisp eq "allegro") {
            $command=$ENV{ALLEGRO} || "alisp";
-           $EVAL = "-e";
+           $EVAL = "-e"; $LOAD="-L";
            $CMDLINE="${command} -q -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        } elsif ($lisp eq "allegromodern") {
            $command=$ENV{ALLEGROMODERN} || "mlisp";
            $EVAL = "-e";
+           $LOAD = "-L";
            $CMDLINE="${command} -q -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        } elsif ($lisp eq "sbcl") {
@@ -124,6 +126,7 @@ sub lisp_handler {
        } elsif ($lisp eq "clisp") {
            $command=$ENV{CLISP} || "clisp";
            $EVAL = "-x";
+           $LOAD = "-i";
            $CMDLINE="${command} -norc -ansi -x \'(require :asdf)\' -i xmls.asd -x \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        }
