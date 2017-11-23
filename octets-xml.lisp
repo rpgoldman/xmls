@@ -73,7 +73,7 @@
 (defun test ()
   (let* ((flux-test (asdf:system-relative-pathname
                      :xmls/octets "octets-tests/flux/flux-test.sexp"))
-         (reference (with-open-file (in flux-test)
+         (reference (with-open-file (in flux-test :external-format :utf-8)
                       (read in))))
     (loop with success-p = t
           for test-case in (mapcar #'(lambda (x)
