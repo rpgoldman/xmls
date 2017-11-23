@@ -10,13 +10,13 @@ our $SEPARATOR="";
 our $usage = <<'USAGE';
 usage: run-tests.sh [options] [tests]
 options: 
-    --sbcl run tests with sbcl (default)
-    --cmucl run tests with cmucl
     --abcl run tests with abcl
-    --ccl run tests with clozure common lisp
     --allegro run tests with Allegro Common Lisp, ANSI mode
     --allegromodern run tests with Allegro Common Lisp, modern case-sensitive mode
-    --all run all tests in tests directory
+    --ccl run tests with clozure common lisp
+    --cmucl run tests with cmucl
+    --sbcl run tests with sbcl (default)
+    --all run all tests in tests directory (default)
     --verbose output parsed xml
 USAGE
 
