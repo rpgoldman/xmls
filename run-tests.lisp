@@ -4,12 +4,51 @@
 (in-package :xmls-test-runner)
 
 (require :asdf)
+
+(defmacro quit-on-error (&body body)
+  (let ((code 1))
+   (when (numberp (first body))
+     (setf code (pop body)))
+    `(call-quitting-on-error (lambda () ,@body) ,code)))
+
+(defun call-quitting-on-error (thunk &optional (code 1))
+  "Unless the environment variable DEBUG_ASDF_TEST
+is bound, write a message and exit on an error.  If
+*asdf-test-debug* is true, enter the debugger."
+  (flet ((quit (c desc)
+           (format *error-output* "~&Encountered ~a during test.~%~a~%" desc c)
+           (cond
+            ;; decline to handle the error.
+            ((ignore-errors (funcall (find-symbol "GETENV" :asdf) "DEBUG_ASDF_TEST"))
+             (format t "~&Interactive mode (DEBUG_ASDF_TEST) -- Invoke debugger.~%")
+             (invoke-debugger c))
+            (t
+             (finish-output *standard-output*)
+             (finish-output *trace-output*)
+             (format *error-output* "~&ABORTING:~% ~S~%" c)
+             (uiop:print-condition-backtrace c)
+             (format *error-output* "~&ABORTING:~% ~S~%" c)
+             (finish-output *error-output*)
+             (uiop:quit code "~&Script failed~%" 1)))))
+    (handler-bind
+        ((error (lambda (c)
+                  (quit c  "ERROR")))
+         (storage-condition
+          (lambda (c) (quit c "STORAGE-CONDITION")))
+         (serious-condition (lambda (c)
+                              (quit c "Other SERIOUS-CONDIITON"))))
+      (funcall thunk)
+      (format t "~&Script succeeded~%")
+      t)))
+
+
 ;; for this to work, we must ensure that ASDF gets an OK configuration
 ;; on startup.
-(asdf:load-system :flexi-streams)
-(asdf:load-system :fiveam)
-(asdf:load-system "cl-ppcre")               ; need to do this here because it doesn't build without warnings.
 (setf asdf:*compile-file-failure-behaviour* :error)
+(quit-on-error 
+ (asdf:load-system :flexi-streams)
+ (asdf:load-system :fiveam)
+ (asdf:load-system "cl-ppcre"))               ; need to do this here because it doesn't build without warnings.
 (setf asdf:*compile-file-warnings-behaviour* :error)
 (defvar *build-warning* nil)
 (defvar *build-error* nil)
@@ -51,41 +90,6 @@
        (uiop:die 2 "XMLS/OCTETS build failed with warning(s):~%~{~a~%~}"
                *build-warning*)))
 
-(defmacro quit-on-error (&body body)
-  (let ((code 1))
-   (when (numberp (first body))
-     (setf code (pop body)))
-    `(call-quitting-on-error (lambda () ,@body) ,code)))
-
-(defun call-quitting-on-error (thunk &optional (code 1))
-  "Unless the environment variable DEBUG_ASDF_TEST
-is bound, write a message and exit on an error.  If
-*asdf-test-debug* is true, enter the debugger."
-  (flet ((quit (c desc)
-           (format *error-output* "~&Encountered ~a during test.~%~a~%" desc c)
-           (cond
-            ;; decline to handle the error.
-            ((ignore-errors (funcall (find-symbol "GETENV" :asdf) "DEBUG_ASDF_TEST"))
-             (format t "~&Interactive mode (DEBUG_ASDF_TEST) -- Invoke debugger.~%")
-             (invoke-debugger c))
-            (t
-             (finish-output *standard-output*)
-             (finish-output *trace-output*)
-             (format *error-output* "~&ABORTING:~% ~S~%" c)
-             (uiop:print-condition-backtrace c)
-             (format *error-output* "~&ABORTING:~% ~S~%" c)
-             (finish-output *error-output*)
-             (uiop:quit code "~&Script failed~%" 1)))))
-    (handler-bind
-        ((error (lambda (c)
-                  (quit c  "ERROR")))
-         (storage-condition
-          (lambda (c) (quit c "STORAGE-CONDITION")))
-         (serious-condition (lambda (c)
-                              (quit c "Other SERIOUS-CONDIITON"))))
-      (funcall thunk)
-      (format t "~&Script succeeded~%")
-      t)))
 
 (quit-on-error
   3
