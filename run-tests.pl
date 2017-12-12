@@ -56,6 +56,9 @@ unless ( $TESTS ) {
   if ($code != 0) {
     print "XMLS parsing tests failed.\n";
     exit $code
+  } else {
+    if ($verbose) {
+    }
   }
 }
 
@@ -77,22 +80,22 @@ if ($code) {
 print STDERR "Done running 5AM tests.\n";
 exit 0;
 
-our @all_tests;
-sub set_all_tests {
-    File::Find::find({wanted => \&wanted}, "$FindBin::RealBin/tests/");
-    if ($verbose) {
-      print STDERR "Test list is:\n";
-      foreach my $test (@all_tests) {
-        print STDERR "\t$test\n";
-      }
-    }
-    $TESTS = join(" ", @all_tests);
-}
+# our @all_tests;
+# sub set_all_tests {
+#     File::Find::find({wanted => \&wanted}, "$FindBin::RealBin/tests/");
+#     if ($verbose) {
+#       print STDERR "Test list is:\n";
+#       foreach my $test (@all_tests) {
+#         print STDERR "\t$test\n";
+#       }
+#     }
+#     $TESTS = join(" ", @all_tests);
+# }
 
-sub wanted {
-    /^.*\.xml\z/s
-    && push @all_tests, $File::Find::name;
-}
+# sub wanted {
+#     /^.*\.xml\z/s
+#     && push @all_tests, $File::Find::name;
+# }
 
 sub usage {
     print $usage;
@@ -102,25 +105,25 @@ sub lisp_handler {
     my $lisp = shift;
     if ( $lisp eq "abcl" ) {
            $command=$ENV{ABCL} || "abcl";
-           $CMDLINE="${command} --noinit --noinform --eval \'(require :asdf)\' --load xmls.asd --eval \'(asdf:load-system :xmls)\' ";
+           $CMDLINE="${command} --noinit --noinform"; # --eval \'(require :asdf)\' --load xmls.asd --eval \'(asdf:load-system :xmls)\' ";
        } elsif ( $lisp eq "ccl" ) {
            $command=$ENV{CCL} || "ccl";
-           $CMDLINE="${command} --no-init --quiet --eval \'(require :asdf)\' --load xmls.asd --eval '(asdf:load-system :xmls)' ";
+           $CMDLINE="${command} --no-init --quiet" # --eval \'(require :asdf)\' --load xmls.asd --eval '(asdf:load-system :xmls)' ";
            $SEPARATOR="--";
        } elsif ( $lisp eq "cmucl" ) {
            $command=$ENV{CMUCL} || "lisp";
            $EVAL="-eval"; $LOAD="-load";
-           $CMDLINE="${command} -noinit -eval \'(require :asdf)\' -load xmls.asd -eval \'(asdf:load-system :xmls)\' ";
+           $CMDLINE="${command} -noinit " #-eval \'(require :asdf)\' -load xmls.asd -eval \'(asdf:load-system :xmls)\' ";
        } elsif ($lisp eq "allegro") {
            $command=$ENV{ALLEGRO} || "alisp";
            $EVAL = "-e"; $LOAD="-L";
-           $CMDLINE="${command} -q -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
+           $CMDLINE="${command} -q" # -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        } elsif ($lisp eq "allegromodern") {
            $command=$ENV{ALLEGROMODERN} || "mlisp";
            $EVAL = "-e";
            $LOAD = "-L";
-           $CMDLINE="${command} -q -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
+           $CMDLINE="${command} -q "; #-e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        } elsif ($lisp eq "sbcl") {
            # the default...
@@ -128,7 +131,7 @@ sub lisp_handler {
            $command=$ENV{CLISP} || "clisp";
            $EVAL = "-x";
            $LOAD = "-i";
-           $CMDLINE="${command} -norc -ansi -x \'(require :asdf)\' -i xmls.asd -x \'(asdf:load-system :xmls)\' ";
+           $CMDLINE="${command} -norc -ansi"; # -x \'(require :asdf)\' -i xmls.asd -x \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        }
 }
