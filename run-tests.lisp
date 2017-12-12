@@ -16,7 +16,7 @@
 is bound, write a message and exit on an error.  If
 *asdf-test-debug* is true, enter the debugger."
   (flet ((quit (c desc)
-           (format *error-output* "~&Encountered ~a during test.~%~a~%" desc c)
+           (uiop:safe-format! *error-output* "~&Encountered ~a during test.~%~a~%" desc c)
            (cond
             ;; decline to handle the error.
             ((ignore-errors (funcall (find-symbol "GETENV" :asdf) "DEBUG_ASDF_TEST"))
