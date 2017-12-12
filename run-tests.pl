@@ -108,7 +108,7 @@ sub lisp_handler {
            $CMDLINE="${command} --noinit --noinform"; # --eval \'(require :asdf)\' --load xmls.asd --eval \'(asdf:load-system :xmls)\' ";
        } elsif ( $lisp eq "ccl" ) {
            $command=$ENV{CCL} || "ccl";
-           $CMDLINE="${command} --no-init --quiet" # --eval \'(require :asdf)\' --load xmls.asd --eval '(asdf:load-system :xmls)' ";
+           $CMDLINE="${command} --no-init --quiet"; # --eval \'(require :asdf)\' --load xmls.asd --eval '(asdf:load-system :xmls)' ";
            $SEPARATOR="--";
        } elsif ( $lisp eq "cmucl" ) {
            $command=$ENV{CMUCL} || "lisp";
@@ -117,7 +117,7 @@ sub lisp_handler {
        } elsif ($lisp eq "allegro") {
            $command=$ENV{ALLEGRO} || "alisp";
            $EVAL = "-e"; $LOAD="-L";
-           $CMDLINE="${command} -q" # -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
+           $CMDLINE="${command} -q"; # -e \'(require :asdf)\' -L xmls.asd -e \'(asdf:load-system :xmls)\' ";
            $SEPARATOR="--";
        } elsif ($lisp eq "allegromodern") {
            $command=$ENV{ALLEGROMODERN} || "mlisp";
