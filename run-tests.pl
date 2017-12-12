@@ -68,7 +68,8 @@ print STDERR "Command for 5AM tests is:\n\t$cmd\n";
 my $code = system $cmd;
 print STDERR "ASDF test output code is: $code\n";
 if ($code) {
-  exit $code
+  print STDERR "Exiting script with code $code\n";
+  exit $code;
 }
 print STDERR "Done running ASDF tests.\n";
 exit 0;
