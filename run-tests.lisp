@@ -31,8 +31,9 @@ is bound, write a message and exit on an error.  If
              (uiop:safe-format! *error-output* "~&ABORTING:~% ~S~%" c)
              (uiop:print-condition-backtrace c)
              (uiop:safe-format! *error-output* "~&ABORTING:~% ~S~%" c)
+             (uiop:safe-format! *error-output* "~&Script failed~%")
              (finish-output *error-output*)
-             (uiop:quit code "~&Script failed~%" 1)))))
+             (uiop:quit code t)))))
     (handler-bind
         ((error (lambda (c)
                   (quit c  "ERROR")))
