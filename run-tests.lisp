@@ -11,6 +11,8 @@
      (setf code (pop body)))
     `(call-quitting-on-error (lambda () ,@body) ,code)))
 
+(trace uiop:raw-print-backtrace)
+
 (defun call-quitting-on-error (thunk &optional (code 1))
   "Unless the environment variable DEBUG_ASDF_TEST
 is bound, write a message and exit on an error.  If
