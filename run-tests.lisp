@@ -28,9 +28,9 @@ is bound, write a message and exit on an error.  If
             (t
              (finish-output *standard-output*)
              (finish-output *trace-output*)
-             (format *error-output* "~&ABORTING:~% ~S~%" c)
+             (uiop:safe-format! *error-output* "~&ABORTING:~% ~S~%" c)
              (uiop:print-condition-backtrace c)
-             (format *error-output* "~&ABORTING:~% ~S~%" c)
+             (uiop:safe-format! *error-output* "~&ABORTING:~% ~S~%" c)
              (finish-output *error-output*)
              (uiop:quit code "~&Script failed~%" 1)))))
     (handler-bind
