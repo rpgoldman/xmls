@@ -12,6 +12,7 @@
     `(call-quitting-on-error (lambda () ,@body) ,code)))
 
 (trace uiop:raw-print-backtrace)
+(trace uiop:print-condition-backtrace)
 
 (defun call-quitting-on-error (thunk &optional (code 1))
   "Unless the environment variable DEBUG_ASDF_TEST
