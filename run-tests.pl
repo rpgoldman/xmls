@@ -36,8 +36,7 @@ GetOptions ( "abcl" => \&lisp_handler,
              "clisp" => \&lisp_handler,
              "help" => \$help,
              "usage" => \$help,
-             "verbose" => \&set_verbose,
-             "all" => \&set_all_tests,
+             "verbose" => \&set_verbose
              );
 
 if ($help) {
@@ -45,23 +44,32 @@ if ($help) {
   exit 0;
 }
 
-unless ( $TESTS ) {
-    set_all_tests();
-}
+# unless ( $TESTS ) {
+#     set_all_tests();
+# }
 
-{
-  my $command =  "$CMDLINE $EVAL \"(require :asdf)\" $EVAL \"(asdf:load-system :xmls)\" $EVAL \"$FORM\" $SEPARATOR $TESTS";
-  print "$command\n" if $verbose;
-  my $code = system $command;
-  if ($code != 0) {
-    print "XMLS parsing tests failed.\n";
-    exit $code
-  } else {
-    if ($verbose) {
-    }
-  }
-}
+# {
+#   my $command =  "$CMDLINE $EVAL \"(require :asdf)\" $EVAL \"(asdf:load-system :xmls)\" $EVAL \"$FORM\" $SEPARATOR $TESTS";
+#   print "$command\n" if $verbose;
+#   my $code = system $command;
+#   if ($code != 0) {
+#     print "XMLS parsing tests failed.\n";
+#     exit $code
+#   } else {
+#     if ($verbose) {
+#     }
+#   }
+# }
 
+print STDERR "Running ASDF tests.\n";
+my $cmd = "$CMDLINE $LOAD $FindBin::RealBin/run-tests.lisp";
+print STDERR "Command for 5AM tests is:\n\t$cmd\n";
+my $code = system $cmd;
+if ($code) {
+  exit $code
+}
+print STDERR "Done running ASDF tests.\n";
+exit 0;
 
 # subroutines from here on down...
 
@@ -69,16 +77,6 @@ sub set_verbose {
     $FORM="(progn (setf xmls::*test-verbose* t)(xmls::test))";
     $verbose = 1;
 }
-
-print STDERR "Running 5AM tests.\n";
-my $cmd = "$CMDLINE $LOAD $FindBin::RealBin/run-tests.lisp";
-print STDERR "Command for 5AM tests is:\n\t$cmd\n";
-my $code = system $cmd;
-if ($code) {
-  exit $code
-}
-print STDERR "Done running 5AM tests.\n";
-exit 0;
 
 # our @all_tests;
 # sub set_all_tests {
