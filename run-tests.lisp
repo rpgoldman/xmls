@@ -4,7 +4,7 @@
 (in-package :xmls-test-runner)
 
 (require :asdf)
-
+(format t "ASDF version is ~a~%" (asdf:asdf-version))
 (defmacro quit-on-error (&body body)
   (let ((code 1))
    (when (numberp (first body))
