@@ -4,12 +4,11 @@
 (in-package :xmls-test-runner)
 
 (require :asdf)
-(load (merge-pathnames "quicklisp/setup.lisp" (user-homedir-pathname)))
-(asdf:initialize-source-registry '(:source-registry (:directory :here)
-                                   :inherit-configuration))
-(ql:quickload :flexi-streams)
-(ql:quickload :fiveam)
-(ql:quickload "cl-ppcre")               ; need to do this here because it doesn't build without warnings.
+;; for this to work, we must ensure that ASDF gets an OK configuration
+;; on startup.
+(asdf:load-system :flexi-streams)
+(asdf:load-system :fiveam)
+(asdf:load-system "cl-ppcre")               ; need to do this here because it doesn't build without warnings.
 (setf asdf:*compile-file-failure-behaviour* :error)
 (setf asdf:*compile-file-warnings-behaviour* :error)
 (defvar *build-warning* nil)
