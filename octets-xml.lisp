@@ -85,7 +85,7 @@
           for parsed = (with-open-file (octets (asdf:system-relative-pathname
                                                 :xmls/octets test-case)
                                                :element-type '(unsigned-byte 8))
-                         (xmls:parse (make-xml-stream octets) nil))
+                         (xmls:parse (make-xml-stream octets) :quash-errors t))
           as parsed-list = (xmls:node->nodelist parsed)
           do (when (not (equal parsed-list reference))
                (setf success-p nil)
