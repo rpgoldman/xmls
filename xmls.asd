@@ -43,7 +43,8 @@
 
 (defsystem :xmls/octets
   :components ((:file "octets-xml"))
-  :depends-on ("xmls" "flexi-streams" "cl-ppcre")
+  ;; detecting the encoding doesn't work properly with flexi-streams 1.0.14
+  :depends-on ("xmls" (:version  "flexi-streams" "1.0.15") "cl-ppcre")
   :perform (test-op (op c)
               (declare (ignorable op c))
               (unless
