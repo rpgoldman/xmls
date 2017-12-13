@@ -7,8 +7,9 @@ use File::Find;
 our $FORM = "(xmls::test)";
 our $EVAL = "--eval";
 our $SEPARATOR="";
+our $quicklisp = 0;
 our $usage = <<'USAGE';
-usage: run-tests.sh [options] [tests]
+usage: run-tests.pl [options]
 options: 
     --abcl run tests with abcl
     --allegro run tests with Allegro Common Lisp, ANSI mode
@@ -16,8 +17,13 @@ options:
     --ccl run tests with clozure common lisp
     --cmucl run tests with cmucl
     --sbcl run tests with sbcl (default)
-    --all run all tests in tests directory (default)
+    --quicklisp run against quicklisp
     --verbose output parsed xml
+
+Note, there are two ways to run this system: either you can run it in an environment
+where Quicklisp is available, and the ancillary libraries needed for the tests are
+available that way, or you can use the CL_SOURCE_REGISTRY configuration to set up
+ASDF to find the ancillary libraries.
 USAGE
 
 our $command = $ENV{SBCL} || "sbcl";
@@ -36,8 +42,10 @@ GetOptions ( "abcl" => \&lisp_handler,
              "clisp" => \&lisp_handler,
              "help" => \$help,
              "usage" => \$help,
-             "verbose" => \&set_verbose
+             "verbose" => \&set_verbose,
+             "quicklisp" => \$quicklisp
              );
+$ENV{"QUICKLISP"} = $quicklisp;
 
 if ($help) {
   print $usage;

@@ -5,14 +5,15 @@
 
 (require :asdf)
 (format t "ASDF version is ~a~%" (asdf:asdf-version))
+(defparameter *quicklisp-p* (not (zerop (parse-integer (uiop:getenv "QUICKLISP")))) )
+(when *quicklisp-p*
+  (load (merge-pathnames "quicklisp/setup.lisp" 
+                           (user-homedir-pathname))))
 (defmacro quit-on-error (&body body)
   (let ((code 1))
    (when (numberp (first body))
      (setf code (pop body)))
     `(call-quitting-on-error (lambda () ,@body) ,code)))
-
-(trace uiop:raw-print-backtrace)
-(trace uiop:print-condition-backtrace)
 
 (defun call-quitting-on-error (thunk &optional (code 1))
   "Unless the environment variable DEBUG_ASDF_TEST
@@ -49,10 +50,12 @@ is bound, write a message and exit on an error.  If
 ;; for this to work, we must ensure that ASDF gets an OK configuration
 ;; on startup.
 (setf asdf:*compile-file-failure-behaviour* :error)
-(quit-on-error 
- (asdf:load-system :flexi-streams)
- (asdf:load-system :fiveam)
- (asdf:load-system "cl-ppcre"))               ; need to do this here because it doesn't build without warnings.
+(quit-on-error
+ (macrolet ((load-system (s)
+                         (if *quicklisp-p* `(uiop:symbol-call '#:ql '#:quickload ,s)`(asdf:load-system ,s))))
+   (load-system :flexi-streams)
+   (load-system :fiveam)
+   (load-system "cl-ppcre")))               ; need to do this here because it doesn't build without warnings.
 (setf asdf:*compile-file-warnings-behaviour* :error)
 (defvar *build-warning* nil)
 (defvar *build-error* nil)
