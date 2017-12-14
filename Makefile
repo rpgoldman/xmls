@@ -41,3 +41,7 @@ website: ;
 	ssh common-lisp.net "cd ${webhome_dir}; cp clnet-page.shtml index.shtml;"
 
 publish: archive publish-archive publish-latest website
+
+clean:
+	rm -r build
+
