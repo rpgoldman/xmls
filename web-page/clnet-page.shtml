@@ -15,8 +15,18 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
 <h2>Downloads</h2>
 
 <table>
-    <tr> 
-    <td><span style="color: red">latest --></span> Bugfixes, support for XML prolog.</td>
+  <tr>
+    <td><span style="color: red">latest --></span> Addition of
+      XMLS/OCTETS subsystem.</td>
+      <td>xmls-3.0</td> 
+      <td><a href="xmls-3.0.tgz">source</a></td> 
+      <td><a href="xmls-3.0.tgz.asc">signature</a></td> 
+      <td><a href="xmls-3.0.tgz.md5">md5</a></td> 
+      <td><a href="latest/Changelog">changelog</a></td> 
+    </tr>
+
+    <tr>
+      <td>&nbsp;</td> 
     <td>xmls-1.7.1</td> 
     <td><a href="xmls-1.7.1.tgz">source</a></td> 
     <td><a href="xmls-1.7.1.tgz.asc">signature</a></td> 

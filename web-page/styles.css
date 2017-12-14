@@ -1,0 +1,110 @@
+/* $Id: mcp.css,v 1.7 2002/07/26 22:29:27 miles Exp $ */
+
+/*
+ * global styles
+ */
+body
+{
+  background: white;
+  color: black;
+  font-size: 15px;
+  font-family: serif;
+  margin: 0; padding: 0;
+}
+
+a[href] 
+{ 
+  border-bottom: 1px dotted rgb(192,72,23);
+  color: rgb(240,156,0);
+  font-weight: bold; 
+  text-decoration: none;
+}
+a[href]:hover { color: #fff; background: black; font-weight: bold; text-decoration: none }
+a[href]:visited { color: rgb(255,176,20); font-weight: bold; text-decoration: none }
+
+img { border: 1px solid black }
+
+h1 { color: rgb(192,72,23) }
+h2,h3 { color: #777; }
+h2, h3 { text-transform: lowercase }
+
+ul { list-style-type: square; }
+
+pre 
+{ 
+  background: #ffd;
+  border: 1px solid #bba;
+  display: table;
+  margin: 0.25em 1em;
+  padding: 0.25em;
+}
+
+.logo 
+{ 
+  display: block;
+  float: left;
+  font-family: verdana;
+  padding: 0.1em;
+}
+.logo span
+{ 
+  color: rgb(255,180,0);
+  font-size: 300%; font-variant: small-caps; font-weight: bold;
+  padding: 5px 10px;
+}
+
+/*
+ * general layout stuff
+ */
+div#nav
+{ 
+  background: rgb(124,113,81);
+  color: white;
+  border-bottom: 5px solid black;
+  font-family: sans-serif;
+  margin: 0; padding: 0 1em;
+  height: 4em;
+}
+div#nav a 
+{ 
+  border: 0;
+  color: rgb(203,189,168);
+  display: block;
+  float: left;
+  font-size: 120%;
+  font-family: sans-serif;
+  margin: 1em 1em; padding: 0;
+  text-align: center;
+  text-decoration: none;
+  width: 6em; height: 1.5em;
+}
+div#nav a:hover 
+{ 
+  background: transparent;
+  color: white;
+  text-decoration: none 
+}
+
+div#content 
+{ 
+  margin: 0 auto; padding: 0 2em;
+}
+
+#footer { border-top: 1px solid #ccc; padding: 0.5em 1em; margin: 1em }
+#footer img { border: 0; }
+#footer a[href] { border: 0; }
+#footer a[href]:hover { background: transparent; }
+
+/*
+ * rpm pages
+ */ 
+table.rpmtable
+{ 
+  margin: 1em;
+}
+table.rpmtable td
+{ 
+  padding: 2px 0.5em;
+}
+.note { color: red; font-weight: bold; font-size: 80%; font-style: italic; }
+
