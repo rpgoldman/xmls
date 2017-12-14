@@ -19,10 +19,11 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
     <td><span style="color: red">latest --></span> Addition of
       XMLS/OCTETS subsystem.</td>
       <td>xmls-3.0</td> 
-      <td><a href="xmls-3.0.tgz">source</a></td> 
+      <td><a href="xmls-3.0.tgz">source tarball</a></td> 
       <td><a href="xmls-3.0.tgz.asc">signature</a></td> 
-      <td><a href="xmls-3.0.tgz.md5">md5</a></td> 
-      <td><a href="latest/Changelog">changelog</a></td> 
+      <td><a href="xmls-3.0.tgz.md5">md5</a></td>
+      <!-- I can't be bothered maintaining the changelog. [2017/12/14:rpg] -->
+      <!-- <td><a href="latest/Changelog">changelog</a></td>  -->
     </tr>
 
     <tr>
@@ -31,7 +32,6 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
     <td><a href="xmls-1.7.1.tgz">source</a></td> 
     <td><a href="xmls-1.7.1.tgz.asc">signature</a></td> 
     <td><a href="xmls-1.7.1.tgz.md5">md5</a></td> 
-    <td><a href="latest/Changelog">changelog</a></td> 
   </tr> 
   <tr> 
     <td>&nbsp;</td> 
