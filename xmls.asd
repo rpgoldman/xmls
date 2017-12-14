@@ -16,7 +16,7 @@
 ;    (call-next-method)))
 ;
 (defsystem :xmls
-    :version "3.0"
+    :version (:read-file-form "version.lisp-expr")
     :license "BSD"
     :maintainer "Robert P. Goldman <rpgoldman@sift.net>"
     :in-order-to ((test-op (test-op "xmls/test") (test-op "xmls/unit-test")))
@@ -45,6 +45,7 @@
   :components ((:file "octets-xml"))
   ;; detecting the encoding doesn't work properly with flexi-streams 1.0.14
   :depends-on ("xmls" (:version  "flexi-streams" "1.0.15") "cl-ppcre")
+  :version (:read-file-form "version.lisp-expr")
   :perform (test-op (op c)
               (declare (ignorable op c))
               (unless
