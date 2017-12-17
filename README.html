@@ -17,9 +17,9 @@
 <p>Since XMLS was first released it has gained some additional
 complications/features.  In particular:</p>
 <ul>
-  <li>Now XMLS by default parses XML documents into lisp structures,
-  rather than s-expressions.  This makes accessing the structures
-  simpler and more reliable.</li>
+  <li><strong>Now XMLS by default parses XML documents into lisp structures,
+  rather than s-expressions.</strong>  This makes accessing the structures
+  simpler and more reliable. See <a href="#Compatibility" >section on backward compatibility</a>.</li>
   <li>We have added clearly named accessors to further improve
   extraction of information from parsed XML.</li>
   <li>Thanks to Max Rottenkolber, we now have the affiliated library,
@@ -148,26 +148,46 @@ Would parse as:
  (("subject" . "http://bookinfo") (("rank" "1")) "\"Cybernetic Fables\""))
 </pre>
 
+<a  name="Compatibility"><h3>Backward Compatibility</h3></a>
 
+<p>To detect whether in this version of XMLS the return value of <code>PARSE</code> will be a
+list or a structure, check for the feature <code>:XMLS-NODES-ARE-STRUCTS</code>.
+
+<p>For old code that wants XML parsed into lists, instead of
+structures, you may replace calls to <code>(parse str)</code> with
+<code>(node-&gt;nodelist (parse str))</code>.</p>
+
+<p>For greater convenience, we offer <code>PARSE-TO-LIST</code>, which
+performs the same function.</p>
 
 <h2>Usage</h2>
 
 <p>
-  The interface is straightforward.  The two main functions are parse and toxml.
+  The interface is straightforward.  The two main functions are
+  <code>PARSE</code> and <code>TOXML</code>.
 </p>
 
 <pre>
-(parse source &amp;key (compress-whitespace t))
+(parse source &amp;key (compress-whitespace t) (quash-errors t)
 </pre>
 
 <p>
   Parse accepts either a string or an input stream and attempts to parse the xml
   document contained therein.  It will return the s-expr parse tree if it's
-  successful or nil if parsing fails.
+  successful or nil if parsing fails.</p>
 
-  If compress-whitespace is t, content nodes will be trimmed of whitespace and
+<p>
+  If <code>COMPRESS-WHITESPACE</code> is non-<code>NIL</code>, content nodes will be trimmed of whitespace and
   empty whitespace strings between nodes will be discarded.
 </p>
+
+
+<pre>
+(parse-to-list source (&rest args))
+</pre>
+
+<p>Functions as <code>PARSE</code>, but returns a list representation
+of the XML document, instead of a structure.</p>
 
 <pre>
 (write-prologue xml-decl doctype stream)
@@ -218,7 +238,7 @@ U.S. spelling alternative to <code>write-prologue</code>.
 structure representation of the XML tree and the s-expression
 representation:</p>
 <dl>
-  <dt><code>nodes-&gt;nodelist</code></dt>
+  <dt><code>node-&gt;nodelist</code></dt>
   <dd>Translate the structure representation into s-expressions.</dd>
 
   <dt><code>nodelist-&gt;nodes</code></dt>
