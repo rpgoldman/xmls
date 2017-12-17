@@ -9,6 +9,8 @@
   (:documentation "Component class to quash some ACL warnings.")
   )
 
+(pushnew :xmls-nodes-are-structs *features*)
+
 ;#+allegro
 ;(defmethod perform :around ((op compile-op) (file xmls-source-file))
 ;  "Quash ACL warning about nested reader macros."

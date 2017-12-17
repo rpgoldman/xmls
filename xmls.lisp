@@ -11,6 +11,9 @@
            node-p nodelist->node
            node->nodelist
 
+           ;; backwards compatibility
+           #:parse-to-list
+
            ;; processing instruction objects
            proc-inst-p
            proc-inst-target
@@ -830,6 +833,9 @@ character translation."
           (xml-parse-error () nil))
         (document (make-state :stream stream)))))
 
+(defun parse-to-list (&rest args)
+  (node->nodelist (apply #'parse args)))
+
 (defparameter *test-files*
   (mapcar #'(lambda (x) (asdf:system-relative-pathname "xmls" (format nil "tests/~a" x)))
           (list "ant/build.xml"
@@ -888,11 +894,11 @@ otherwise exit with an error exit status."
                      #+ccl
                      ccl:*unprocessed-command-line-arguments*)))
       (catch 'test-failure
-        (with-open-file (str test :direction :input)
-          (handler-bind ((error #'(lambda (c)
+        (handler-bind ((error #'(lambda (c)
                                     (format t "FAILED with error:~%~a~%" c)
                                     (setf exit-code 1)
                                     (throw 'test-failure nil))))
+          (with-open-file (str test :direction :input)
             (if *test-verbose*
                 (let ((parsed (parse str :compress-whitespace t)))
                   (if parsed
@@ -907,7 +913,23 @@ otherwise exit with an error exit status."
                          (format t "ok~%"))
                         (t
                          (setf exit-code 1)
-                         (format t "FAILED!~%")))))))))
+                         (format t "FAILED!~%"))))))
+          (with-open-file (str test :direction :input)
+           (if *test-verbose*
+               (let ((parsed (parse-to-list str :compress-whitespace t)))
+                 (if parsed
+                     (format t "~A~%" (toxml parsed :indent t))
+                     (progn
+                       (format t "~&Failed to parse ~A~%" test)
+                       (setf exit-code 1))))
+               (progn
+                 (format t "~40A" (concatenate 'string (namestring test) "... "))
+                 (force-output)
+                 (cond ((parse-to-list str)
+                        (format t "ok~%"))
+                       (t
+                        (setf exit-code 1)
+                        (format t "FAILED!~%")))))))))
     (catch 'test-failure
       (handler-bind ((error #'(lambda (c)
                                 (format t "FAILED with error:~%~S~%" c)
