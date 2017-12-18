@@ -10,6 +10,7 @@
   (:export node-name node-ns node-attrs node-children make-node parse toxml write-xml
            node-p nodelist->node
            node->nodelist
+           node ; needed to support use in typep
 
            ;; backwards compatibility
            #:parse-to-list
