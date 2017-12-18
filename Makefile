@@ -30,6 +30,7 @@ publish-archive:
 	$(eval GPGSIG := ${TARBALL}.asc)
 	$(eval MD5SUM := ${TARBALL}.md5)
 	rsync --times --chmod=a+rX,ug+w ${TARBALL} ${GPGSIG} ${MD5SUM}  ${website}
+	ssh common-lisp.net "cd ${webhome_dir}; ln -sf ${TARBALL} latest.tar.gz; ln -sf ${GPGSIG} latest.tar.gz.asc; ln -sf ${MD5SUM} latest.tar.gz.md5;"
 
 # must be done after archive
 publish-latest:
