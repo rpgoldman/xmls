@@ -54,19 +54,28 @@ check the first two return values.)"
   (labels ((find-test ( key xml-form )
              ;; test whether the XML-FORM matches KEY
              (cond
-               ;; just the XML tag name
-               ((atom key)
-                (equal key (car xml-form)))
+               ;; just the XML tag name in key
+               ;; XML name is simple string
+               ((and (stringp key)
+                     (stringp (car xml-form)))
+                (string-equal key (car xml-form)))
 
-               ;; form (tag-name (attr-name attr-value))
+               ;; just the XML tag name in key
+               ;; XML name with namespace, form (string . namespace)
+               ((and (stringp key)
+                     (consp (car xml-form))
+                     (stringp (caar xml-form)))
+                (string-equal key (caar xml-form)))
+
+               ;; key form (tag-name (attr-name attr-value))
                (t
                 (and (find-test (car key) xml-form)
                      (find (cadr key) (cadr xml-form) :test #'equal)))))
 
            (descend ( key-list xml-form )
-             ;; recursive run down KEY-LIST.  If XML runs down to NIL before reaching
+             ;; recursive run down KEY-LIST.  If XML-FORM runs down to NIL before reaching
              ;; the end of KEY-LIST, it will be NIL at the end.  If not, what is
-             ;; remaining of XML is the found item.
+             ;; remaining of XML-FORM is the found item.
              (cond
                ;; KEY-LIST ends without dotted item, at the target XML form
                ((null (cdr key-list)) 
