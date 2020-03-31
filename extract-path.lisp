@@ -6,21 +6,21 @@
 
 (defun extract-path ( key-list xml )
   "Extracts data from XML parse tree.  KEY-LIST is a path for descending down named
-objects in the argument XML.  For each path element, inner XML data objects are searched for a
-matching name.  Finally the whole last matching object is normally returned; however
-the symbol * may be added at the end of KEY-LIST to return list of all objects
-enclosed by the last matching object. KEY-LIST may be dotted as explained below to
-finally return XML tag attributes.
+objects in the argument XML.  For each path element, enclosed XML subforms are
+searched for a matching name.  Finally the whole last XML subform on the path is
+normally returned; however the symbol * may be added at the end of KEY-LIST to return
+list of all objects enclosed by the last subform on the path. KEY-LIST may be dotted
+as explained below to return XML tag attributes from the last subform on the path.
 
 XML has the parse form as returned by XMLS:PARSE-TO-LIST or XMLS:NODE->NODELIST:
         (tag-name (attributes-list) subform*)
 
-The top level tag name in the XML node list must be matched by the start of KEY-LIST.
-Subsequently each element in the KEY-LIST is to match the name of a subform.
+The first element in KEY-LIST must match the top level form in the XML.  Subsequently
+each element in the KEY-LIST is to match the name of a subform.
 
 An element of KEY-LIST may be a string atom.  In that case the first subform with
-tagname matching the string is matched.  An element of KEY-LIST may also be a list of
-string atoms in this form:
+tag name matching the string is matched.  An element of KEY-LIST may also be a list of
+string atoms in this format:
         (tag-name (attribute-name attribute-value))
 
 The first subform with name matching TAG-NAME and having an attribute matching
@@ -40,17 +40,18 @@ was matched, and at what point in XML:
         (values RESULT  KEY-LIST-FRAGMENT  XML-FRAGMENT)
 
 When RESULT is non-NIL, the others are NIL. When result is NIL however, the others are:
-        XML-FRAGMENT       the last XML form that /did/ match in the key list.  There
-          may be useful information in the form, especially in the attributes.
+        XML-FRAGMENT
+          The last XML form that /did/ match in the key list.  It matches the first
+          element of KEY-LIST-FRAGMENT.
 
-        KEY-LIST-FRAGMENT  the /remaining/ part of the KEY-LIST that did not succeed.
-          However the /first/ item on KEY-LIST-FRAGMENT is the item that /did/ match
-          the XML-FRAGMENT returned.  The fail is at the second item on KEY-LIST-
-          FRAGMENT.
+        KEY-LIST-FRAGMENT
+          The /remaining/ part of the KEY-LIST that did not succeed.  However the
+          /first/ item on KEY-LIST-FRAGMENT matches the XML-FRAGMENT returned.  The
+          failure is at the second item on KEY-LIST-FRAGMENT.
 
-To differentiate the case of complete failure, where even the very first item on KEY-
-LIST does not match the form given, all three return values are NIL.  (It suffices to
-check the first two return values.)"
+In the case of complete failure, where even the very first item on KEY-LIST does not
+match the top XML form given, all three return values are NIL.  (It suffices to check
+the first two return values.)"
   (labels ((find-test ( key xml-form )
              ;; test whether the XML-FORM matches KEY
              (cond
