@@ -52,6 +52,9 @@ When RESULT is non-NIL, the others are NIL. When result is NIL however, the othe
 In the case of complete failure, where even the very first item on KEY-LIST does not
 match the top XML form given, all three return values are NIL.  (It suffices to check
 the first two return values.)"
+  (when (typep xml 'node)
+    (setf xml
+          (node->nodelist xml)))
   (labels ((find-test ( key xml-form )
              ;; test whether the XML-FORM matches KEY
              (cond

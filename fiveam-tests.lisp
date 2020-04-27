@@ -101,3 +101,51 @@
       (is (equalp result
                   '(("article-title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") NIL
                     "HNS, a nuclearcytoplasmic shuttling sequence in HuR"))))))
+
+(def-fixture parsed-article-struct ()
+  (let ((node
+          (with-open-file (str (asdf:system-relative-pathname "xmls" "tests/nxml/genetics-article.xml")
+                               :direction :input)
+            (xmls:parse str))))
+    (&body)))
+
+(test check-extract-path-from-structs
+  (with-fixture parsed-article-struct ()
+    ;; retrieve first of items matching the path
+    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                       "back" "ref-list" "ref")
+                                     node)))
+      (is (= 4 (length result)))
+      (is (equalp (nth 0 result)
+                  '("ref" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle")))
+      (is (equalp (nth 1 result)
+                  '(("id" "gkt903-B1")))))
+
+    ;; retrieve tag attributes of first item matching the path
+    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                       "back" "ref-list" "ref" . *)
+                                     node)))
+      (is (equalp result
+                  '(("id" "gkt903-B1")))))
+
+    ;; retrieve all items enclosed by element matching the path
+    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                       "back" "ref-list" *)
+                                     node)))
+      (is (= 41 (length result)))
+      (is (equalp (nth 0 result)
+                  '(("title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") nil "REFERENCES")))
+      (is (equalp (nth 1 (nth 1 result))
+                  '(("id" "gkt903-B1"))))
+      (is (equalp (nth 1 (nth 15 result))
+                  '(("id" "gkt903-B15")))))
+
+    ;; select specific item among several with same tag based on tag attributes
+    ;; here selecting on "ref" in the path...
+    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                       "back" "ref-list" ("ref" ("id" "gkt903-B15")) "element-citation"
+                                       "article-title")
+                                     node)))
+      (is (equalp result
+                  '(("article-title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") NIL
+                    "HNS, a nuclearcytoplasmic shuttling sequence in HuR"))))))
