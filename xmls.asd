@@ -38,8 +38,8 @@
                 (error "Failed XMLS test.")))
   :depends-on (xmls))
 
-(defsystem xmls/unit-test
-    :depends-on (xmls fiveam)
+(defsystem :xmls/unit-test
+  :depends-on (xmls fiveam)
   :perform (test-op (op c)
               (declare (ignorable op c))
               (uiop:symbol-call :fiveam :run! (uiop:find-symbol* '#:xmls-test :xmls-test)))
