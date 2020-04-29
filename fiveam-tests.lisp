@@ -64,9 +64,9 @@
 (test check-extract-path
   (with-fixture parsed-article ()
     ;; retrieve first of items matching the path
-    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
-                                       "back" "ref-list" "ref")
-                                     node)))
+    (let ((result (xmls:extract-path-list '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                            "back" "ref-list" "ref")
+                                          node)))
       (is (= 4 (length result)))
       (is (equalp (nth 0 result)
                   '("ref" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle")))
@@ -74,16 +74,16 @@
                   '(("id" "gkt903-B1")))))
 
     ;; retrieve tag attributes of first item matching the path
-    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
-                                       "back" "ref-list" "ref" . *)
-                                     node)))
+    (let ((result (xmls:extract-path-list '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                            "back" "ref-list" "ref" . *)
+                                          node)))
       (is (equalp result
                   '(("id" "gkt903-B1")))))
 
     ;; retrieve all items enclosed by element matching the path
-    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
-                                       "back" "ref-list" *)
-                                     node)))
+    (let ((result (xmls:extract-path-list '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                            "back" "ref-list" *)
+                                          node)))
       (is (= 41 (length result)))
       (is (equalp (nth 0 result)
                   '(("title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") nil "REFERENCES")))
@@ -94,10 +94,10 @@
 
     ;; select specific item among several with same tag based on tag attributes
     ;; here selecting on "ref" in the path...
-    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
-                                       "back" "ref-list" ("ref" ("id" "gkt903-B15")) "element-citation"
-                                       "article-title")
-                                     node)))
+    (let ((result (xmls:extract-path-list '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                            "back" "ref-list" ("ref" ("id" "gkt903-B15")) "element-citation"
+                                            "article-title")
+                                          node)))
       (is (equalp result
                   '(("article-title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") NIL
                     "HNS, a nuclearcytoplasmic shuttling sequence in HuR"))))))
@@ -115,18 +115,15 @@
     (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
                                        "back" "ref-list" "ref")
                                      node)))
-      (is (= 4 (length result)))
-      (is (equalp (nth 0 result)
-                  '("ref" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle")))
-      (is (equalp (nth 1 result)
-                  '(("id" "gkt903-B1")))))
+      (is (string= (node-name result) "ref"))
+      (is (string= (node-ns result) "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle"))
+      (is (equalp (node-attrs result) '(("id" "gkt903-B1")))))
 
     ;; retrieve tag attributes of first item matching the path
     (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
                                        "back" "ref-list" "ref" . *)
                                      node)))
-      (is (equalp result
-                  '(("id" "gkt903-B1")))))
+      (is (equalp result '(("id" "gkt903-B1")))))
 
     ;; retrieve all items enclosed by element matching the path
     (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
@@ -134,10 +131,13 @@
                                      node)))
       (is (= 41 (length result)))
       (is (equalp (nth 0 result)
-                  '(("title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") nil "REFERENCES")))
-      (is (equalp (nth 1 (nth 1 result))
+                  (make-node :name "title"
+                             :ns "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle"
+                             :attrs nil
+                             :children '("REFERENCES"))))
+      (is (equalp (node-attrs (nth 1 result))
                   '(("id" "gkt903-B1"))))
-      (is (equalp (nth 1 (nth 15 result))
+      (is (equalp (node-attrs (nth 15 result))
                   '(("id" "gkt903-B15")))))
 
     ;; select specific item among several with same tag based on tag attributes
@@ -147,5 +147,7 @@
                                        "article-title")
                                      node)))
       (is (equalp result
-                  '(("article-title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") NIL
-                    "HNS, a nuclearcytoplasmic shuttling sequence in HuR"))))))
+                  (make-node :name "article-title"
+                             :ns "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle"
+                             :attrs NIL
+                             :children '("HNS, a nuclearcytoplasmic shuttling sequence in HuR")))))))

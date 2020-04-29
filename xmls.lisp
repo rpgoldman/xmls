@@ -32,6 +32,7 @@
            xmlrep-boolean-attrib-value
 
            ;; tree searching from Daniel Eliason
+           extract-path-list
            extract-path
 
            ;;debugging
