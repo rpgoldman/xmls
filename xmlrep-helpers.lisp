@@ -10,34 +10,73 @@
 ;;;   [2004/09/15:Robert P. Goldman] Created.
 ;;;
 ;;;---------------------------------------------------------------------------
+;; (declaim (optimize (speed 0) (space 0) (debug 3) (safety 3) (compilation-speed 0)))
+
 (in-package :xmls)
 
-(defun make-xmlrep (tag &key attribs children)
-  (make-node :name tag :attrs attribs :children children))
+(defun make-xmlrep (tag &key (representation-kind :node) namespace attribs children)
+  (case representation-kind
+    ((:list)
+     (cond
+       (namespace
+        (list (list tag namespace) (list attribs) children))
+       (t
+        (list tag (list attribs) children))))
+    ((:node)
+     (make-node :name tag :ns namespace :attrs attribs :children children))
+    (otherwise
+     (error "REPRESENTATION-KIND must be :LIST or :NODE, found ~s" representation-kind))))
 
-(defun xmlrep-add-child! (xmlrep child)
-  (setf (node-children xmlrep)
-        (append (node-children xmlrep)
-                (list child))))
+(defgeneric xmlrep-add-child! (xmlrep child)
+  (:method ((xmlrep node) child)
+    (setf (node-children xmlrep)
+          (append (node-children xmlrep)
+                  (list child))))
+  (:method ((xmlrep cons) child)
+    (setf (cddr xmlrep)
+          (append (cddr xmlrep)
+                  (list child)))))
 
-(defun xmlrep-tag (treenode)
-  (node-name treenode))
+(defgeneric xmlrep-tag (treenode)
+  (:method ((treenode node))
+    (node-name treenode))
+  (:method ((treenode cons))
+    (let ((tag-name (car treenode)))
+      ;; detect the "namespaced" case
+      (cond
+        ((consp tag-name) (car tag-name))
+        (t tag-name)))))
 
 (defun xmlrep-tagmatch (tag treenode)
-  (unless (stringp treenode)            ; child nodes to XMLREPs could be strings or nodes
+  ;;child nodes to XMLREPs could be strings or nodes
+  (unless (stringp treenode)
     (string-equal tag (xmlrep-tag treenode))))
 
-(defun xmlrep-attribs (treenode)
-  (node-attrs treenode))
+(defgeneric xmlrep-attribs (treenode)
+  (:method ((treenode node))
+    (node-attrs treenode))
+  (:method ((treenode cons))
+    (cadr treenode)))
 
-(defun (setf xmlrep-attribs) (attribs treenode)
-  (setf (node-attrs treenode) attribs))
+(defgeneric (setf xmlrep-attribs) (attribs treenode)
+  (:argument-precedence-order treenode attribs)
+  (:method (attribs (treenode node))
+    (setf (node-attrs treenode) attribs))
+  (:method (attribs (treenode cons))
+    (setf (cadr treenode) attribs)))
 
-(defun xmlrep-children (treenode)
-  (node-children treenode))
+(defgeneric xmlrep-children (treenode)
+  (:method ((treenode node))
+    (node-children treenode))
+  (:method ((treenode cons))
+    (cddr treenode)))
 
-(defun (setf xmlrep-children) (children treenode)
-  (setf (node-children treenode) children))
+(defgeneric (setf xmlrep-children) (children treenode)
+  (:argument-precedence-order treenode children)
+  (:method (children (treenode node))
+    (setf (node-children treenode) children))
+  (:method (children (treenode cons))
+    (setf (cddr treenode) children)))
 
 (defun xmlrep-string-child (treenode &optional (if-unfound :error))
   (let ((children (xmlrep-children treenode)))

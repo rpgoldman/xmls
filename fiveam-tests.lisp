@@ -1,3 +1,5 @@
+;; (declaim (optimize (speed 0) (space 0) (debug 3) (safety 3) (compilation-speed 0)))
+
 (in-package :common-lisp-user)
 (defpackage xmls-test
   (:use :common-lisp :fiveam :xmls)
@@ -54,19 +56,19 @@
 					    (xmls:parse "<?xml version=\"1.0\"?> <text:list-style style:name=\"L1\"></text:list-style>"))
 			 :attr-ns))))
 
-(def-fixture parsed-article ()
-  (let ((node
+(def-fixture article-parsed-as-list ()
+  (let ((parse-tree
           (with-open-file (str (asdf:system-relative-pathname "xmls" "tests/nxml/genetics-article.xml")
                                :direction :input)
             (xmls:parse-to-list str))))
     (&body)))
 
-(test check-extract-path
-  (with-fixture parsed-article ()
+(test check-extract-path-from-list-nodes
+  (with-fixture article-parsed-as-list ()
     ;; retrieve first of items matching the path
-    (let ((result (xmls:extract-path-list '("OAI-PMH" "GetRecord" "record" "metadata" "article"
-                                            "back" "ref-list" "ref")
-                                          node)))
+     (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                       "back" "ref-list" "ref")
+                                     parse-tree)))
       (is (= 4 (length result)))
       (is (equalp (nth 0 result)
                   '("ref" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle")))
@@ -74,16 +76,16 @@
                   '(("id" "gkt903-B1")))))
 
     ;; retrieve tag attributes of first item matching the path
-    (let ((result (xmls:extract-path-list '("OAI-PMH" "GetRecord" "record" "metadata" "article"
-                                            "back" "ref-list" "ref" . *)
-                                          node)))
+    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                       "back" "ref-list" "ref" . *)
+                                     parse-tree)))
       (is (equalp result
                   '(("id" "gkt903-B1")))))
 
     ;; retrieve all items enclosed by element matching the path
-    (let ((result (xmls:extract-path-list '("OAI-PMH" "GetRecord" "record" "metadata" "article"
-                                            "back" "ref-list" *)
-                                          node)))
+    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                       "back" "ref-list" *)
+                                     parse-tree)))
       (is (= 41 (length result)))
       (is (equalp (nth 0 result)
                   '(("title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") nil "REFERENCES")))
@@ -94,27 +96,27 @@
 
     ;; select specific item among several with same tag based on tag attributes
     ;; here selecting on "ref" in the path...
-    (let ((result (xmls:extract-path-list '("OAI-PMH" "GetRecord" "record" "metadata" "article"
-                                            "back" "ref-list" ("ref" ("id" "gkt903-B15")) "element-citation"
-                                            "article-title")
-                                          node)))
+    (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
+                                       "back" "ref-list" ("ref" ("id" "gkt903-B15")) "element-citation"
+                                       "article-title")
+                                     parse-tree)))
       (is (equalp result
                   '(("article-title" . "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle") NIL
                     "HNS, a nuclearcytoplasmic shuttling sequence in HuR"))))))
 
-(def-fixture parsed-article-struct ()
-  (let ((node
+(def-fixture article-parsed-as-struct ()
+  (let ((parse-tree
           (with-open-file (str (asdf:system-relative-pathname "xmls" "tests/nxml/genetics-article.xml")
                                :direction :input)
             (xmls:parse str))))
     (&body)))
 
-(test check-extract-path-from-structs
-  (with-fixture parsed-article-struct ()
+(test check-extract-path-from-struct-nodes
+  (with-fixture article-parsed-as-struct ()
     ;; retrieve first of items matching the path
     (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
                                        "back" "ref-list" "ref")
-                                     node)))
+                                     parse-tree)))
       (is (string= (node-name result) "ref"))
       (is (string= (node-ns result) "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle"))
       (is (equalp (node-attrs result) '(("id" "gkt903-B1")))))
@@ -122,13 +124,13 @@
     ;; retrieve tag attributes of first item matching the path
     (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
                                        "back" "ref-list" "ref" . *)
-                                     node)))
+                                     parse-tree)))
       (is (equalp result '(("id" "gkt903-B1")))))
 
     ;; retrieve all items enclosed by element matching the path
     (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
                                        "back" "ref-list" *)
-                                     node)))
+                                     parse-tree)))
       (is (= 41 (length result)))
       (is (equalp (nth 0 result)
                   (make-node :name "title"
@@ -145,7 +147,7 @@
     (let ((result (xmls:extract-path '("OAI-PMH" "GetRecord" "record" "metadata" "article"
                                        "back" "ref-list" ("ref" ("id" "gkt903-B15")) "element-citation"
                                        "article-title")
-                                     node)))
+                                     parse-tree)))
       (is (equalp result
                   (make-node :name "article-title"
                              :ns "http://dtd.nlm.nih.gov/2.0/xsd/archivearticle"
