@@ -63,21 +63,23 @@ Children are stored as a list of either element nodes or text nodes.
 
 For example, the following xml document:
 
-<pre><?xml version="1.0"?>
+```
+<?xml version="1.0"?>
 <!-- test document -->
 <book title='The Cyberiad'>
   <!-- comment in here -->
   <author xmlns='http://authors'>Stanislaw Lem</author>
   <info:subject xmlns:info='http://bookinfo' rank='1'>&quot;Cybernetic Fables&quot;</info:subject>
 </book>
-</pre>
+```
 
 Would parse as:
 
-<pre>("book" (("title" "The Cyberiad"))
+```
+("book" (("title" "The Cyberiad"))
  (("author" . "http://authors") NIL "Stanislaw Lem")
  (("subject" . "http://bookinfo") (("rank" "1")) "\"Cybernetic Fables\""))
-</pre>
+```
 
 <a name="Compatibility">
 
@@ -221,4 +223,4 @@ Previous versions of XMLS were single files, and could be installed simply by lo
 
 ## Contact Information
 
-Please contact Robert Goldman, rpgoldman AT sift.net with any questions or bug reports.
+Please post issues in the [GitHub Repository](https://github.com/rpgoldman/xmls/issues)
