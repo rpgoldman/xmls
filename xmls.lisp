@@ -551,7 +551,7 @@ character translation."
 	 ;; If SUFFIX is true, then NAME is Prefix and SUFFIX is
 	 ;; LocalPart.
 	 (if suffix
-	     (list 'attr suffix val :ns name)
+	     (list 'attr suffix val :attr-ns name)
 	     (list 'attr name val))))))
 
 (defrule ws ()
