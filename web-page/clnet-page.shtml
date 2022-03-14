@@ -17,8 +17,17 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
 <table>
   <tr>
 
-    <td><span style="color: red">latest --></span> Better backwards
-  compatibility (see manual for details). Additional export over 3.0.1</td>
+
+
+     <td><span style="color: red">latest --></span> Preserve namespacing in attribute names.</td>
+      <td>xmls-3.1.0</td> 
+       <td><a href="xmls-3.1.0.tar.gz">source</a></td> 
+      <td><a href="xmls-3.1.0.tar.gz.asc">signature</a></td> 
+      <td><a href="xmls-3.1.0.tar.gz.md5">md5</a></td> 
+    </tr>
+
+    <tr>
+       <td>&nbsp;</td> 
       <td>xmls-3.0.2</td> 
        <td><a href="xmls-3.0.2.tar.gz">source</a></td> 
       <td><a href="xmls-3.0.2.tar.gz.asc">signature</a></td> 
@@ -27,8 +36,8 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
       <!-- <td><a href="latest/Changelog">changelog</a></td>  -->
     </tr>
 
-    <td>Better backwards
-  compatibility (see manual for details).</td>
+    <tr>
+       <td>&nbsp;</td> 
       <td>xmls-3.0.1</td> 
        <td><a href="xmls-3.0.1.tar.gz">source</a></td> 
       <td><a href="xmls-3.0.1.tar.gz.asc">signature</a></td> 

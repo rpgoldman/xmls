@@ -20,8 +20,7 @@ TARBALL := "build/${XMLSDIR}.tar.gz"
 
 archive: ;
 	mkdir -p build
-	svn export . build/$(XMLSDIR) 
-	tar zcf ${TARBALL} -C build $(XMLSDIR)
+	git archive --output ${TARBALL} --prefix 'xmls/' HEAD
 	gpg -o ${TARBALL}.asc --sign ${TARBALL}
 	md5sum --binary ${TARBALL} > ${TARBALL}.md5
 
