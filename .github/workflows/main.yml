@@ -59,4 +59,4 @@ jobs:
     - name: tests
       shell: bash
       run: |
-        QUICKLISP=1 ros -s `pwd`/:: -l run-tests.lisp
+        QUICKLISP=1 ros -S `pwd`/:: -l run-tests.lisp
