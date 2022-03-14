@@ -68,9 +68,9 @@ jobs:
            (ql:quickload "fiveam")
            (asdf:load-system :xmls)
            (defmacro test-fail-p (test-result)
-             `(typecase ,test-result
-               (,(uiop:find-symbol* '#:fiveam '#:test-passed) nil)
-               (,(uiop:find-symbol* '#:fiveam '#:test-failure) t)
+             \`(typecase ,test-result
+               (,(uiop:find-symbol* '#:fiveam \'#:test-passed) nil)
+               (,(uiop:find-symbol* '#:fiveam \'#:test-failure) t)
                (null t)
                (list (find-if (function (lambda (x) (test-fail-p x))) ,test-result))
                (t nil)))
