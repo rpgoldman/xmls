@@ -1,5 +1,9 @@
 # $Id$
 
+3.1
+	* Fix namespacing issue (Github #5) on attributes. Thanks to David
+	A. Thompson.
+
 1.8
 	* Added optional error suppression when items aren't found.
 

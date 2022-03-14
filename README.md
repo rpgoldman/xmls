@@ -1,6 +1,6 @@
 # XMLS
 
-<center>Manual For Version 3</center>
+<center>Manual For Version 3.1</center>
 
 ## Summary
 
@@ -57,7 +57,7 @@ In the s-expression representation, a node is represented as follows:
 
 A name is either a simple string, if the element does not belong to a namespace, or a list of (name namespace-url) if the element does belong to a namespace.
 
-Attributes are stored as (name value) lists.
+Attributes are stored as `(name value)` lists, with optional properties after the value for `(name value . plist)`.  At present, the only property used is `:attr-ns`, the namespace on the attribute, if any.  If there is no namespace, the attribute may not be present.
 
 Children are stored as a list of either element nodes or text nodes.
 
