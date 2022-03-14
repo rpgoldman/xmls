@@ -48,3 +48,9 @@
     (is (equal (list "profile" "profile" "profile")
                (mapcar #'xmlrep-tag (xmlrep-children node))))))
 
+(test attribute-with-prefixed-name
+      (is (string= "style"
+		   (getf (xmls::find-attrib "name"
+					    (xmls:parse "<?xml version=\"1.0\"?> <text:list-style style:name=\"L1\"></text:list-style>"))
+			 :attr-ns))))
+

@@ -546,8 +546,13 @@ character translation."
          (setf val (match* attr-text-sq))
          (match #\'))))
       t)
-     (if (string= "xmlns" name) (list 'nsdecl suffix val) (list
-                                                           'attr (or suffix name) val)))))
+     (if (string= "xmlns" name)
+	 (list 'nsdecl suffix val)
+	 ;; If SUFFIX is true, then NAME is Prefix and SUFFIX is
+	 ;; LocalPart.
+	 (if suffix
+	     (list 'attr suffix val :attr-ns name)
+	     (list 'attr name val))))))
 
 (defrule ws ()
   (and (match+ ws-char)
