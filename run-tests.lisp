@@ -3,10 +3,15 @@
 
 (in-package :xmls-test-runner)
 
+(defun featurep (x)
+  (member x *features* :test 'eq))
+
 (require :asdf)
 (format t "ASDF version is ~a~%" (asdf:asdf-version))
-(defparameter *quicklisp-p* (not (zerop (parse-integer (uiop:getenv "QUICKLISP")))) )
-(when *quicklisp-p*
+(defparameter *quicklisp-p* (or (featurep :quicklisp)
+                                (not (zerop (parse-integer (uiop:getenv "QUICKLISP"))))) )
+;; Roswell puts its quicklip set up in a different place.
+(when (and  *quicklisp-p* (not (featurep :ros.init)))
   (load (merge-pathnames "quicklisp/setup.lisp" 
                            (user-homedir-pathname))))
 (defmacro quit-on-error (&body body)
