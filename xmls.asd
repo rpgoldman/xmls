@@ -32,9 +32,9 @@
 
 (defsystem :xmls/test
   :perform (test-op (op c)
+              (declare (ignorable op c))
               #-(or sbcl cmu allegro abcl ccl clisp ecl)
               (error "Test OP for XMLS not supported on this lisp implementation.")
-              (declare (ignorable op c))
               (unless 
                 (uiop:symbol-call :xmls :test :interactive t)
                 (error "Failed XMLS test.")))
