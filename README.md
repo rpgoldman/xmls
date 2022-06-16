@@ -41,7 +41,7 @@ In the structure representation, a node, corresponding to an XML element, is def
   attrs
   children)</pre>
 
-Xmls also includes a helper function, make-node for creating xml nodes of this form:
+XMLS also includes a helper function, `make-node` for creating xml nodes of this form:
 
 <pre>(make-node &key name ns attrs children)
 </pre>
@@ -100,7 +100,7 @@ The interface is straightforward. The two main functions are `PARSE` and `TOXML`
 <pre>(parse source &key (compress-whitespace t) (quash-errors t)
 </pre>
 
-Parse accepts either a string or an input stream and attempts to parse the xml document contained therein. It will return the s-expr parse tree if it's successful or nil if parsing fails.
+Parse accepts either a string or an input stream (`source`) and attempts to parse the XML document contained therein. It will return the parse tree as a structure if it's successful or `nil` if parsing fails.
 
 If `COMPRESS-WHITESPACE` is non-`NIL`, content nodes will be trimmed of whitespace and empty whitespace strings between nodes will be discarded.
 
@@ -112,7 +112,7 @@ Functions as `PARSE`, but returns a list representation of the XML document, ins
 <pre>(write-prologue xml-decl doctype stream)
 </pre>
 
-write-prologue writes the leading `<?xml ... ?>` and `<!DOCTYPE ... >` elements to `stream`. `xml-decl` is an alist of attribute name value pairs. Valid xml-decl attributes per the xml spec are "version", "encoding", and "standalone", though write-prologue does not verify this. `doctype` is a string containing the document type definition.
+`write-prologue` writes the leading `<?xml ... ?>` and `<!DOCTYPE ... >` elements to `stream`. `xml-decl` is an alist of attribute name, value pairs. Valid xml-decl attributes per the xml spec are "version", "encoding", and "standalone", though `write-prologue` does not verify this. `doctype` is a string containing the document type definition.
 
 <pre>(write-prolog xml-decl doctype stream)
 </pre>
@@ -122,12 +122,12 @@ U.S. spelling alternative to `write-prologue`.
 <pre>(write-xml xml stream &key (indent nil))
 </pre>
 
-write-xml accepts a lisp list in the format described above and writes the equivalent xml string to stream. Currently, if nodes use namespaces xmls will not assign namespaces prefixes but will explicitly assign the namespace to each node. This will be changed in a later release. Xmls will indent the generated xml output if indent is non-nil.
+`write-xml` accepts a lisp list in the format described above and writes the equivalent xml string to stream. Currently, if nodes use namespaces XMLS will not assign namespaces prefixes but will explicitly assign the namespace to each node. This will be changed in a later release. XMLS will indent the generated xml output if `indent` is non-nil.
 
 <pre>(toxml node &key (indent nil))
 </pre>
 
-`TOXML` is a convenience wrapper around write-xml that returns the in a newly allocated string.
+`TOXML` is a convenience wrapper around `write-xml` that returns the in a newly allocated string.
 
 <a name="translators">
 
@@ -217,7 +217,7 @@ Probably `make-xml-stream` should be made generic, and support arguments of othe
 
 ## Installation
 
-xmls can be installed as an asdf system. An asdf system definition is provided with the distribution.
+XMLS can be installed as an ASDF system. An ASDF system definition is provided with the distribution.
 
 Previous versions of XMLS were single files, and could be installed simply by loading the file xmls.lisp. This option is no longer supported.
 

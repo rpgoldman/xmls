@@ -1,5 +1,9 @@
 # $Id$
 
+3.2
+	* Add XMLS/octets to handle character encodings.  Many thanks to
+	Daniel Eliason for contributing this.
+
 3.1
 	* Fix namespacing issue (Github #5) on attributes. Thanks to David
 	A. Thompson.
