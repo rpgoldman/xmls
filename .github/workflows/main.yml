@@ -23,6 +23,12 @@ jobs:
         lisp:
           - ccl
           - sbcl
+          # - allegro Allegro from Roswell can't load FiveAM from quicklisp
+          - ecl
+          - cmu
+          # - clisp clisp install from Roswell does not work.
+          # - mkcl Tests not implemented on mkcl
+          # - abcl ABCL install from Roswell does not work
 
     steps:
     - uses: actions/checkout@v2
