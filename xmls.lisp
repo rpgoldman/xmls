@@ -44,18 +44,19 @@
 (defvar *compress-whitespace* t)
 (defvar *test-verbose* nil)
 (defvar *discard-processing-instructions*)
-(defvar *entities*
-  #(("lt;" #\<)
-    ("gt;" #\>)
-    ("amp;" #\&)
-    ("apos;" #\')
-    ("quot;" #\")))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
+  (declaim (type vector *entities*))
+  (defvar *entities*
+    #(("lt;" #\<)
+      ("gt;" #\>)
+      ("amp;" #\&)
+      ("apos;" #\')
+      ("quot;" #\")))
   (defvar *whitespace* (remove-duplicates
                         '(#\Newline #\Space #\Tab #\Return #\Linefeed))))
 (defvar *char-escapes*
   (let ((table (make-array 256 :element-type 'string :initial-element "")))
-    (declare (type vector *entities*))
     (loop
      for code from 0 to 255
      for char = (code-char code)
@@ -299,7 +300,6 @@ fixed."
 converted using CODE-CHAR, which only works in implementations that
 internally encode strings in US-ASCII, ISO-8859-1 or UCS."
   (declare (type simple-string ent))
-  (declare (type vector *entities*))
   (or (and (>= (length ent) 2)
            (char= (char ent 0) #\#)
            (code-char
@@ -880,7 +880,7 @@ character translation."
                 "xml-rpc/methodResponse.xml"
                 "xml-rpc/struct.xml")))
 
-#+(or sbcl cmu allegro abcl ccl clisp)
+#+(or sbcl cmu allegro abcl ccl clisp ecl) 
 (defun test (&key interactive (test-files *test-files*))
   "Run the test suite. If it fails, either return NIL \(if INTERACTIVE\),
 otherwise exit with an error exit status."
@@ -897,6 +897,7 @@ otherwise exit with an error exit status."
                      #+cmu  (member "--" extensions:*command-line-strings* :test 'equal)
                      #+allegro (sys:command-line-arguments)
                      #+clisp ext:*args*
+                     #+ecl (ext:command-args)
                      #+ccl
                      ccl:*unprocessed-command-line-arguments*)))
       (catch 'test-failure
