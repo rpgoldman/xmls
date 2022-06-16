@@ -139,11 +139,11 @@ XMLS provides two exported functions to translate between the CL structure repre
 
 <dl>
 
-<dt>`node->nodelist`</dt>
+<dt><code>node->nodelist (<i>node</i>)</code></dt>
 
 <dd>Translate the structure representation into s-expressions.</dd>
 
-<dt>`nodelist->nodes`</dt>
+<dt><code>nodelist->nodes (<i>xmls-sexp</i>)</code></dt>
 
 <dd>Translate the s-expression representation of an XMLS parse tree into lisp structures.</dd>
 
@@ -155,53 +155,53 @@ These are intended to allow programmers to avoid direct manipulation of the XMLS
 
 <dl>
 
-<dt>`make-xmlrep (tag &key attribs children)`</dt>
+<dt><code>make-xmlrep (<i>tag</i> &key <i>attribs</i> <i>children</i>)</code></dt>
 
 <dd>Constructor function.</dd>
 
-<dt>`xmlrep-add-child! (xmlrep child)`</dt>
+<dt><code>xmlrep-add-child! (<i>xmlrep</i> <i>child</i>)</code></dt>
 
 <dd>Add a new child node to the XMLREP node.</dd>
 
-<dt>`xmlrep-tag (xmlrep)`</dt>
+<dt><code>xmlrep-tag (<i>xmlrep</i>)</code></dt>
 
 <dd>Extract the tag from XMLREP.</dd>
 
-<dt>`xmlrep-tagmatch (tag treenode)`</dt>
+<dt><code>xmlrep-tagmatch (<i>tag</i> <i>treenode</i>)</code></dt>
 
 <dd>Returns true if TAG is the tag of TREENODE. Match is case _insensitive_ (quite possibly this is the Wrong Thing).</dd>
 
-<dt>`xmlrep-attribs (xmlrep)`</dt>
+<dt><code>xmlrep-attribs (<i>xmlrep</i>)</code></dt>
 
 <dd>Extract the attributes from an XMLREP node.</dd>
 
-<dt>`xmlrep-children (xmlrep)`</dt>
+<dt><code>xmlrep-children (<i>xmlrep</i>)</code></dt>
 
 <dd>Extract the children from an XMLREP node.</dd>
 
-<dt>`xmlrep-find-child-tags (tag treenode)`</dt>
+<dt><code>xmlrep-find-child-tags (<i>tag</i> <i>treenode</i>)</code></dt>
 
-<dd>Return all of the (direct) children of TREENODE whose tags are TAG. Matching done by [`xmlrep-tagmatch`](#xmlrep-tagmatch).</dd>
+<dd>Return all of the (direct) children of <i>treenode</i> whose tags are <i>tag</i>. Matching done by [`xmlrep-tagmatch`](#xmlrep-tagmatch).</dd>
 
-<dt>`xmlrep-find-child-tag (tag treenode &optional (if-unfound :error))`</dt>
+<dt><code>xmlrep-find-child-tag (<i>tag</i> <i>treenode</i> &optional (<i>if-unfound</i> :error))</code></dt>
 
-<dd>Find a _single_ child of TREENODE with TAG. Returns an error if there is more or less than one such child.</dd>
+<dd>Find a _single_ child of <i>treenode</i> with <i>tag</i>. Returns an error if there is more or less than one such child.</dd>
 
-<dt>`xmlrep-string-child (treenode &optional (if-unfound :error))`</dt>
+<dt><code>xmlrep-string-child (<i>treenode</i> &optional (<i>if-unfound</i> :error))</code></dt>
 
-<dd>Returns the _single_ string-valued child of TREENODE. If there is more than one child, or if a single child is not a simple value, returns IF-UNFOUND, which defaults to :ERROR.</dd>
+<dd>Returns the _single_ string-valued child of <i>treenode</i>. If there is more than one child, or if a single child is not a simple value, returns <i>if-unfound</i>, which defaults to <code>:ERROR</code>.</dd>
 
-<dt>`xmlrep-integer-child (treenode)`</dt>
+<dt><code>xmlrep-integer-child (<i>treenode</i>)</code></dt>
 
-<dd>Find the _single_ child of TREENODE whose value is a string that can be parsed into an integer. Returns an error if there is more than one child, or if a single child is not appropriately valued.</dd>
+<dd>Find the _single_ child of <i>treenode</i> whose value is a string that can be parsed into an integer. Returns an error if there is more than one child, or if a single child is not appropriately valued.</dd>
 
-<dt>`xmlrep-attrib-value (attrib treenode &optional (if-undefined :error))`</dt>
+<dt><code>xmlrep-attrib-value (<i>attrib</i> <i>treenode</i> &optional (<i>if-undefined</i> :error))</code></dt>
 
-<dd>Find the value of ATTRIB, a string, in TREENODE. if there is no ATTRIB, will return the value of IF-UNDEFINED, which defaults to :ERROR.</dd>
+<dd>Find the value of <i>attrib</i>, a string, in <i>treenode</i>. if there is no <i>attrib</i>, will return the value of <i>if-undefined</i>, which defaults to <code>:ERROR</code>.</dd>
 
-<dt>`xmlrep-boolean-attrib-value (attrib treenode &optional (if-undefined :error))`</dt>
+<dt><code>xmlrep-boolean-attrib-value (<i>attrib</i> <i>treenode</i> &optional (<i>if-undefined</i> :error))</code></dt>
 
-<dd>Find the value of ATTRIB, a string, in TREENODE. The value should be either "true" or "false". The function will return T or NIL, accordingly. If there is no ATTRIB, will return the value of IF-UNDEFINED, which defaults to :ERROR.</dd>
+<dd>Find the value of <i>attrib</i>, a string, in <i>treenode</i>. The value should be either "true" or "false". The function will return <code>T</code> or <code>NIL</code>, accordingly. If there is no <i>attrib</i>, will return the value of <i>if-undefined</i>, which defaults to <code>:ERROR</code>.</dd>
 
 </dl>
 
