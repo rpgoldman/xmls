@@ -26,6 +26,8 @@
                         #+asdf-unicode :encoding #+asdf-unicode :utf-8)
                  (:file "xmlrep-helpers"
                         ;; package is defined in XMLS. [2009/02/24:rpg]
+                        :depends-on ("xmls"))
+                 (:file "extract-path"
                         :depends-on ("xmls"))))
 
 (defsystem :xmls/test
@@ -38,8 +40,8 @@
                 (error "Failed XMLS test.")))
   :depends-on (xmls))
 
-(defsystem xmls/unit-test
-    :depends-on (xmls fiveam)
+(defsystem :xmls/unit-test
+  :depends-on (xmls fiveam)
   :perform (test-op (op c)
               (declare (ignorable op c))
               (uiop:symbol-call :fiveam :run! (uiop:find-symbol* '#:xmls-test :xmls-test)))
