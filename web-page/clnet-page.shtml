@@ -17,9 +17,15 @@ PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
 <table>
   <tr>
 
+     <td><span style="color: red">latest --></span> Add XMLS/octets to
+      handle character encodings (thanks to Daniel Eliason for contributing this).</td>
+      <td>xmls-3.2.0</td> 
+       <td><a href="xmls-3.2.0.tar.gz">source</a></td> 
+      <td><a href="xmls-3.2.0.tar.gz.asc">signature</a></td> 
+      <td><a href="xmls-3.2.0.tar.gz.md5">md5</a></td> 
+    </tr>
 
-
-     <td><span style="color: red">latest --></span> Preserve namespacing in attribute names.</td>
+     <td>Preserve namespacing in attribute names.</td>
       <td>xmls-3.1.0</td> 
        <td><a href="xmls-3.1.0.tar.gz">source</a></td> 
       <td><a href="xmls-3.1.0.tar.gz.asc">signature</a></td> 
