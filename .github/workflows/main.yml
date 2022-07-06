@@ -22,13 +22,13 @@ jobs:
         os: [ubuntu-latest]
         lisp:
           - ccl
-          - sbcl
           # - allegro Allegro from Roswell can't load FiveAM from quicklisp
           - ecl
           - cmu
           # - clisp clisp install from Roswell does not work.
           # - mkcl Tests not implemented on mkcl
           # - abcl ABCL install from Roswell does not work
+          - sbcl
 
     steps:
     - name: Collect prerequisites
@@ -36,7 +36,7 @@ jobs:
       if: ${{ matrix.lisp == 'sbcl' }}
       run: |
         sudo apt-get update
-        sudo apt-get install -y zlib1g-dev
+        sudo apt-get install -y zlib1g-dev nlibzstd-dev
 
     - uses: actions/checkout@v2
 
