@@ -31,6 +31,11 @@ jobs:
           # - abcl ABCL install from Roswell does not work
 
     steps:
+    - name: Collect prerequisites
+      shell: bash
+      run: |
+        apt-get update && apt-get install -y zlib1g-dev
+
     - uses: actions/checkout@v2
 
     - name: Checkout submodules
