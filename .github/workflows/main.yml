@@ -21,16 +21,28 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         lisp:
-          - ccl
-          - sbcl
+          - ccl-bin
           # - allegro Allegro from Roswell can't load FiveAM from quicklisp
           - ecl
           - cmu
           # - clisp clisp install from Roswell does not work.
           # - mkcl Tests not implemented on mkcl
           # - abcl ABCL install from Roswell does not work
+          - sbcl-bin
+
+    env:
+      LISP: ${{ matrix.lisp }}
 
     steps:
+    - name: prepare
+      uses: 40ants/setup-lisp@v2
+    # - name: Collect prerequisites
+    #   shell: bash
+    #   if: ${{ matrix.lisp == 'sbcl' }}
+    #   run: |
+    #     sudo apt-get update
+    #     sudo apt-get install -y zlib1g-dev nlibzstd-dev
+
     - uses: actions/checkout@v2
 
     - name: Checkout submodules
@@ -39,29 +51,28 @@ jobs:
         git submodule update --init --recursive
 
     # Lisp setup copied from here: https://github.com/3b/ci-example/blob/master/.github/workflows/CI.yml
-    - name: cache .roswell
-      id: cache-dot-roswell
-      uses: actions/cache@v1
-      with:
-        path: ~/.roswell
-        key: ${{ runner.os }}-dot-roswell-${{ matrix.lisp }}-${{ hashFiles('**/*.asd') }}
-        restore-keys: |
-          ${{ runner.os }}-dot-roswell-${{ matrix.lisp }}-
-          ${{ runner.os }}-dot-roswell-
+    # - name: cache .roswell
+    #   id: cache-dot-roswell
+    #   uses: actions/cache@v1
+    #   with:
+    #     path: ~/.roswell
+    #     key: ${{ runner.os }}-dot-roswell-${{ matrix.lisp }}-${{ hashFiles('**/*.asd') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-dot-roswell-${{ matrix.lisp }}-
+    #       ${{ runner.os }}-dot-roswell-
 
-    - name: install roswell
-      shell: bash
-      # always run install, since it does some global installs and setup that isn't cached
-      env:
-       LISP: ${{ matrix.lisp }}
-      # Use a previous release of Roswell to avoid error encountered
-      # due to libcurl3 not being available.
-      # Source of fix: https://github.com/avodonosov/drakma/commit/fbba29181ba2962f5031da581bd2de4dac98733d
-      run: |
-        sudo apt-get install -y libcurl4
-        curl -L https://raw.githubusercontent.com/roswell/roswell/a8fd8a3c33078d6f06e6cda9d099dcba6fbefcb7/scripts/install-for-ci.sh | sh
+    # - name: install roswell
+    #   shell: bash
+    #   # always run install, since it does some global installs and setup that isn't cached
+    #   env:
+    #    LISP: ${{ matrix.lisp }}
+    #   # Use a previous release of Roswell to avoid error encountered
+    #   # due to libcurl3 not being available.
+    #   # Source of fix: https://github.com/avodonosov/drakma/commit/fbba29181ba2962f5031da581bd2de4dac98733d
+    #   run: |
+    #     sudo apt-get install -y libcurl4
+    #     curl -L https://raw.githubusercontent.com/roswell/roswell/a8fd8a3c33078d6f06e6cda9d099dcba6fbefcb7/scripts/install-for-ci.sh | sh
 
-    # Compile first in a separate step to make the test output more readable
     - name: tests
       shell: bash
       run: |
