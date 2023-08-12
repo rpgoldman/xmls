@@ -11,6 +11,22 @@
 
 (in-suite xmls-test)
 
+(test parse-empty-document
+  (null (parse "")))
+
+(test parse-whitespace-document
+  (null (parse "    ")))
+
+(test parse-multiple-top-level-document
+  (with-input-from-string (s "<a>1</a><b>2</b><c>3</c><c>4</c><c>5</c><c>6</c>")
+    (is (equalp (make-node :name "a" :children '("1")) (parse s)))
+    (is (equalp (make-node :name "b" :children '("2")) (parse s)))
+    (is (equalp (make-node :name "c" :children '("3")) (parse s)))
+    (is (equalp (make-node :name "c" :children '("4")) (parse s)))
+    (is (equalp (make-node :name "c" :children '("5")) (parse s)))
+    (is (equalp (make-node :name "c" :children '("6")) (parse s)))
+    (null (parse s))))
+
 (test check-cdata-backtrack
   (is (equalp (make-node :name "name" :children (list "x]"))
               (parse "<name><![CDATA[x]]]></name>"))))

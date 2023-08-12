@@ -371,7 +371,7 @@ character translation."
 (defmacro match (&rest matchers)
   "Attempts to match the next input character with one of the supplied matchers."
   `(let ((c (peek-stream (state-stream s))))
-    (and
+    (and c
      (or ,@(loop for m in matchers
                  collect (etypecase m
                            (standard-char `(char= ,m c))
