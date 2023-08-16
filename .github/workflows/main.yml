@@ -37,7 +37,7 @@ jobs:
     - name: prepare
       uses: 40ants/setup-lisp@v2
       with:
-        roswell-version: 22.12.14.113
+        roswell-version: v22.12.14.113
     # - name: Collect prerequisites
     #   shell: bash
     #   if: ${{ matrix.lisp == 'sbcl' }}
