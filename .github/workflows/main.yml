@@ -22,7 +22,8 @@ jobs:
         os: [ubuntu-latest]
         lisp:
           - ccl-bin/1.12.2
-          - allegro/10.1express
+          # - allegro/10.1express For whatever reason, this version of
+          # Allegro cannot load FiveAM.
           - ecl
           - cmu-bin/21e
           - clisp/2.49
