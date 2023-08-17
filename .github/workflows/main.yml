@@ -22,14 +22,13 @@ jobs:
         os: [ubuntu-latest]
         lisp:
           - ccl-bin/1.12.2
-          # - allegro Allegro from Roswell can't load FiveAM from quicklisp
+          # - allegro/10.1express For whatever reason, this version of
+          # Allegro cannot load FiveAM.
           - ecl
-          # disable CMU because Roswell's trying to install an
-          # ancient version (18a).
-          # - cmu-bin/21e
-          # - clisp/2.49  clisp install from Roswell does not work.
+          - cmu-bin/21e
+          - clisp/2.49
           # - mkcl Tests not implemented on mkcl
-          # - abcl ABCL install from Roswell does not work
+          - abcl/1.9.2
           - sbcl-bin
           - clisp-head
 
