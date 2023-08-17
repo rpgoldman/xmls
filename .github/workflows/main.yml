@@ -21,14 +21,18 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         lisp:
-          - ccl-bin
+          - ccl-bin/1.12.2
           # - allegro Allegro from Roswell can't load FiveAM from quicklisp
           - ecl
-          - cmu
-          # - clisp clisp install from Roswell does not work.
+          # disable CMU because Roswell's trying to install an
+          # ancient version (18a).
+          # - cmu-bin/21e
+          # - clisp/2.49  clisp install from Roswell does not work.
           # - mkcl Tests not implemented on mkcl
           # - abcl ABCL install from Roswell does not work
           - sbcl-bin
+          - clisp-head
+
 
     env:
       LISP: ${{ matrix.lisp }}
@@ -36,6 +40,9 @@ jobs:
     steps:
     - name: prepare
       uses: 40ants/setup-lisp@v2
+      with:
+        roswell-version: v22.12.14.113
+        asdf-version: 3.3.6
     # - name: Collect prerequisites
     #   shell: bash
     #   if: ${{ matrix.lisp == 'sbcl' }}
@@ -43,7 +50,7 @@ jobs:
     #     sudo apt-get update
     #     sudo apt-get install -y zlib1g-dev nlibzstd-dev
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Checkout submodules
       shell: bash
