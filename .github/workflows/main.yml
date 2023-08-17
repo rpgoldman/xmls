@@ -25,7 +25,7 @@ jobs:
           # - allegro Allegro from Roswell can't load FiveAM from quicklisp
           - ecl
           - cmu-bin/21e
-          # - clisp/2.49  clisp install from Roswell does not work.
+          - clisp/2.49
           # - mkcl Tests not implemented on mkcl
           - abcl/1.9.2 # ABCL install from Roswell does not work
           - sbcl-bin
