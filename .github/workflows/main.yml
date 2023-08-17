@@ -22,7 +22,7 @@ jobs:
         os: [ubuntu-latest]
         lisp:
           - ccl-bin/1.12.2
-          # - allegro Allegro from Roswell can't load FiveAM from quicklisp
+          - allegro/10.1
           - ecl
           - cmu-bin/21e
           - clisp/2.49
