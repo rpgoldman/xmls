@@ -22,7 +22,7 @@ jobs:
         os: [ubuntu-latest]
         lisp:
           - ccl-bin/1.12.2
-          - allegro/10.1
+          - allegro/10.1express
           - ecl
           - cmu-bin/21e
           - clisp/2.49
