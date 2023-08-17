@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         lisp:
-          - ccl-bin
+          - ccl-bin/1.12.2
           # - allegro Allegro from Roswell can't load FiveAM from quicklisp
           - ecl
           # disable CMU because Roswell's trying to install an
