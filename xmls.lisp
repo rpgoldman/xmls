@@ -112,7 +112,7 @@ the line number.")
   ns
   attrs
   children)
-  
+
 (defun make-node (&key name ns attrs child children)
   "Convenience function for creating a new xml node."
   (when (and child children)
@@ -154,7 +154,7 @@ fixed."
                   (node-name node))
               (node-attrs node)
               (mapcar 'node->nodelist (node-children node))))))
-  
+
 
 ;;;-----------------------------------------------------------------------------
 
@@ -355,7 +355,7 @@ character translation."
   (when (char= char #\newline)
     (decf *parser-line-number*))
   (common-lisp:unread-char char stream))
-    
+
 ;;;END shadowing--------------------------------------------------------------
 
 (define-symbol-macro next-char (peek-stream (state-stream s)))
@@ -551,12 +551,12 @@ character translation."
          (match #\'))))
       t)
      (if (string= "xmlns" name)
-	 (list 'nsdecl suffix val)
-	 ;; If SUFFIX is true, then NAME is Prefix and SUFFIX is
-	 ;; LocalPart.
-	 (if suffix
-	     (list 'attr suffix val :attr-ns name)
-	     (list 'attr name val))))))
+         (list 'nsdecl suffix val)
+         ;; If SUFFIX is true, then NAME is Prefix and SUFFIX is
+         ;; LocalPart.
+         (if suffix
+             (list 'attr suffix val :attr-ns name)
+             (list 'attr name val))))))
 
 (defrule ws ()
   (and (match+ ws-char)
@@ -797,7 +797,7 @@ character translation."
                      ((and (eql (element-type c) 'pi)
                            (not *discard-processing-instructions*))
                       (return (setf elem c))))))
-                       
+
     (and elem (element-val elem))))
 
 ;;;-----------------------------------------------------------------------------
@@ -827,7 +827,14 @@ character translation."
     (write-xml e s :indent indent)))
 
 (defun parse (s &key (compress-whitespace t) (quash-errors t))
-  "Parses the supplied stream or string into a lisp node tree."
+  "Parses the supplied stream or string into a lisp node tree.
+
+:QUASH-ERRORS, if true, will cause this function to return NIL
+instead of raising an error if it encounters an XML parsing
+error. Other errors may not be quashed.
+
+Note: This function accepts empty XML documents as input, and returns
+NIL in that case."
   (let* ((*compress-whitespace* compress-whitespace)
          (*discard-processing-instructions* t)
          (stream
@@ -844,7 +851,14 @@ character translation."
         (document (make-state :stream stream)))))
 
 (defun parse-to-list (&rest args)
-  (node->nodelist (apply #'parse args)))
+    "Parses the supplied stream or string into the legacy XMLS
+s-expression format.
+
+Note: This function accepts empty XML documents as input, and returns
+NIL in that case."
+  (let ((parsed (apply #'parse args)))
+    (when parsed
+      (node->nodelist parsed))))
 
 (defparameter *test-files*
   (mapcar #'(lambda (x) (asdf:system-relative-pathname "xmls" (format nil "tests/~a" x)))
@@ -884,7 +898,7 @@ character translation."
                 "xml-rpc/methodResponse.xml"
                 "xml-rpc/struct.xml")))
 
-#+(or sbcl cmu allegro abcl ccl clisp ecl) 
+#+(or sbcl cmu allegro abcl ccl clisp ecl)
 (defun test (&key interactive (test-files *test-files*))
   "Run the test suite. If it fails, either return NIL \(if INTERACTIVE\),
 otherwise exit with an error exit status."
