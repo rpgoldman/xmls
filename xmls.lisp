@@ -884,7 +884,7 @@ character translation."
                 "xml-rpc/methodResponse.xml"
                 "xml-rpc/struct.xml")))
 
-#+(or sbcl cmu allegro abcl ccl clisp ecl) 
+#+(or sbcl cmu allegro abcl ccl clisp ecl dotcl)
 (defun test (&key interactive (test-files *test-files*))
   "Run the test suite. If it fails, either return NIL \(if INTERACTIVE\),
 otherwise exit with an error exit status."
@@ -902,6 +902,7 @@ otherwise exit with an error exit status."
                      #+allegro (sys:command-line-arguments)
                      #+clisp ext:*args*
                      #+ecl (ext:command-args)
+                     #+dotcl (member "--" (dotcl:command-line-arguments) :test 'equal)
                      #+ccl
                      ccl:*unprocessed-command-line-arguments*)))
       (catch 'test-failure
