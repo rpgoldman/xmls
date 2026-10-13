@@ -28,9 +28,10 @@ jobs:
           - cmu-bin/21e
           - clisp/2.49
           # - mkcl Tests not implemented on mkcl
-          - abcl/1.9.2
+          - abcl-bin/1.9.2
           - sbcl-bin
           - clisp-head
+          - dotcl-bin
 
 
     env:
@@ -38,9 +39,9 @@ jobs:
 
     steps:
     - name: prepare
-      uses: 40ants/setup-lisp@v2
+      uses: 40ants/setup-lisp@1a5e7c0b52bafdea40ec54ff13ff1d8285954f37
       with:
-        roswell-version: v22.12.14.113
+        roswell-version: v26.10.118
         asdf-version: 3.3.6
     # - name: Collect prerequisites
     #   shell: bash
