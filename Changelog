@@ -1,5 +1,11 @@
 # $Id$
 
+3.4     * Add support for dotcl, thanks to snmsts (Masatoshi SANO)
+
+3.3	* Handle multiple-root or no-root XML documents.  These are not
+	technically legal XML documents, but it's more robust to handle
+	them.
+
 3.2
 	* Add XMLS/octets to handle character encodings.  Many thanks to
 	Daniel Eliason for contributing this.
